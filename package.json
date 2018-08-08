@@ -5,10 +5,10 @@
   "main": "src/sp8deCrypto.js",
   "repository": {
     "type": "git",
-    "url": "none"
+    "url": "https://github.com/SP8DE/sp8de-client-sdk"
   },
   "keywords": [
-    "Crypto"
+    "Crypto", "Sp8De", "Client-SDK"
   ],
   "author": "Pavel Zubov",
   "scripts": {
