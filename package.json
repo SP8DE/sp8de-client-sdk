@@ -1,0 +1,62 @@
+{
+  "name": "sp8de.crypto",
+  "version": "1.2.10",
+  "description": "Sp8de crypto SDK",
+  "main": "src/sp8deCrypto.js",
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "keywords": [
+    "Crypto"
+  ],
+  "author": "Pavel Zubov",
+  "scripts": {
+    "test": "Jasmine",
+    "watch": "watchify cdn/script.js -o js/script.js -v",
+    "toCDN": "browserify cdn/script.js | uglifyjs > js/script.js",
+    "prepublishOnly": "browserify cdn/script.js > js/script.js"
+  },
+  "presets": [
+    "@babel/preset-env"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "buffer": "^5.1.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.0.0-beta.54",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "babelify": "^8.0.0",
+    "browserify": "^16.2.2",
+    "ethereumjs-util": "^5.2.0",
+    "ethers": "^3.0.26",
+    "jasmine": "^3.1.0",
+    "jasmine-core": "^3.1.0",
+    "jasmine-es6": "^0.4.3",
+    "karma": "^2.0.5",
+    "karma-browserify": "^5.3.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cli": "^1.0.1",
+    "karma-coverage": "^1.1.2",
+    "karma-html-reporter": "^0.2.7",
+    "karma-jasmine": "^1.1.2",
+    "karma-jasmine-html-reporter": "^1.2.0",
+    "karma-jasmine-html-reporter-livereload": "^1.0.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "phantomjs": "^2.1.7",
+    "uglify-es": "^3.3.9",
+    "watchify": "^3.11.0"
+  },
+  "files": [
+    "src"
+  ],
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  }
+}
