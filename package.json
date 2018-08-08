@@ -1,14 +1,16 @@
 {
-  "name": "sp8de.crypto",
-  "version": "1.2.10",
-  "description": "Sp8de crypto SDK",
-  "main": "src/sp8deCrypto.js",
+  "name": "sp8de-client-sdk",
+  "version": "1.0.0",
+  "description": "Sp8de crypto client SDK",
+  "main": "src/sp8deClientSDK.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/SP8DE/sp8de-client-sdk"
   },
   "keywords": [
-    "Crypto", "Sp8De", "Client-SDK"
+    "Crypto",
+    "Sp8De",
+    "Client-SDK"
   ],
   "author": "Pavel Zubov",
   "scripts": {

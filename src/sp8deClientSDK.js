@@ -1,6 +1,6 @@
 let Buffer = require('buffer').Buffer;
 
-export class Sp8deCrypto {
+export class Sp8deClientSDK {
     constructor(eth = undefined, privateKeyGenerator = undefined) {
         this.EthJS = !eth ? window.EthJS.Util : eth;
         this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
