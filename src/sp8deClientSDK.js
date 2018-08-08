@@ -69,47 +69,6 @@ export class Sp8deClientSDK {
         return this.privateKeyGenerator.Wallet.createRandom().privateKey;
     };
 
-    validateOld(signedMessage) {
-        let item, hash, sign, pubKey;
-
-        try {
-            if (!signedMessage) throw new TypeError('Please enter signed message');
-            item = typeof item === 'string' ? JSON.parse(signedMessage) : signedMessage;
-            if (!item.sign) throw new TypeError('Empty sign');
-            if (item.sign.length % 2 !== 0) throw new TypeError('Invalid hex string');
-            sign = Buffer.from(this.getNakedAddress(item.sign), 'hex');
-            if (sign.length !== 65) throw new TypeError('sign length is not valid');
-            sign[64] = sign[64] === 0 || sign[64] === 1 ? sign[64] + 27 : sign[64];
-            hash = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(item.message));
-
-            if (item.version === '3') {
-                if (item.signer === 'trezor') {
-                    hash = this.getTrezorHash(item.message);
-                } else if (item.signer === 'ledger') {
-                    hash = this.EthJS.hashPersonalMessage(Buffer.from(item.message));
-                }
-            } else if (item.version === '1') {
-                hash = this.EthJS.sha3(item.message);
-            }
-
-            pubKey = this.EthJS.ecrecover(
-                hash,
-                sign[64],
-                sign.slice(0, 32),
-                sign.slice(32, 64)
-            );
-
-            if (this.getNakedAddress(item.pubKey) !== this.EthJS.pubToAddress(pubKey).toString('hex')) {
-                throw new TypeError('sign is not valid');
-            }
-        } catch (e) {
-            if (e instanceof SyntaxError) console.error('JSON is not valid');
-            else console.error(e);
-            return false;
-        }
-        return true;
-    };
-
     validate(parameters) {
         let hash, msg, newPubKey;
 
