@@ -53,12 +53,6 @@ export class Sp8deClientSDK {
         return result;
     };
 
-    getRandomIntInclusive(rnd, min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(rnd * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
-    };
-
     generateSeed() {
         let rnd = new Uint32Array(1);
         window.crypto.getRandomValues(rnd);
@@ -71,7 +65,6 @@ export class Sp8deClientSDK {
 
     validate(parameters) {
         let hash, msg, newPubKey;
-
         try {
             if (!parameters.sign) throw new TypeError('Empty parameters.sign');
             if (parameters.sign.length % 2 !== 0) throw new TypeError('Invalid hex string');
@@ -87,7 +80,7 @@ export class Sp8deClientSDK {
                 parameters.sign.slice(0, 32),
                 parameters.sign.slice(32, 64)
             );
-            if (this.getNakedAddress(parameters.pubKey) !== this.EthJS.pubToAddress(newPubKey).toString('hex')) {
+            if (AccessoryFunctions.getNakedAddress(parameters.pubKey) !== this.EthJS.pubToAddress(newPubKey).toString('hex')) {
                 throw new TypeError('parameters.sign is not valid');
             }
         } catch (e) {
@@ -98,11 +91,28 @@ export class Sp8deClientSDK {
         return true;
     };
 
-    getNakedAddress(address) {
+    getTrezorHash(msg) {
+        return this.EthJS.sha3(
+            Buffer.concat([
+                this.EthJS.toBuffer('\u0019Ethereum Signed Message:\n'),
+                AccessoryFunctions.getTrezorLenBuf(msg.length),
+                this.EthJS.toBuffer(msg)
+            ])
+        );
+    };
+}
+
+/*
+*
+* Accessory functions for methods
+*
+* */
+class AccessoryFunctions {
+    static getNakedAddress(address) {
         return address.toLowerCase().replace('0x', '');
     };
 
-    getTrezorLenBuf(msgLen) {
+    static getTrezorLenBuf(msgLen) {
         if (msgLen < 253) return Buffer.from([msgLen & 0xff]);
         else if (msgLen < 0x10000)
             return Buffer.from([253, msgLen & 0xff, (msgLen >> 8) & 0xff]);
@@ -117,16 +127,11 @@ export class Sp8deClientSDK {
         }
     };
 
-    getTrezorHash(msg) {
-        return this.EthJS.sha3(
-            Buffer.concat([
-                this.EthJS.toBuffer('\u0019Ethereum Signed Message:\n'),
-                this.getTrezorLenBuf(msg.length),
-                this.EthJS.toBuffer(msg)
-            ])
-        );
+    static getRandomIntInclusive(rnd, min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(rnd * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
     };
-
 }
 
 /*
