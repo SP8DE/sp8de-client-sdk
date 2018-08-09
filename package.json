@@ -1,6 +1,6 @@
 {
   "name": "sp8de-client-sdk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Sp8de crypto client SDK",
   "main": "src/sp8deClientSDK.js",
   "repository": {
@@ -14,7 +14,7 @@
   ],
   "author": "Pavel Zubov",
   "scripts": {
-    "doc": "jsdoc src/sp8deClientSDK.js",
+    "doc": "jsdoc src/sp8deClientSDK.js --readme README.md --package package.json",
     "test": "karma start",
     "watch": "watchify cdn/script.js -o js/script.js -v",
     "toCDN": "browserify cdn/script.js | uglifyjs > js/script.js",
@@ -26,6 +26,7 @@
   "license": "ISC",
   "dependencies": {
     "buffer": "^5.1.0"
+
   },
   "devDependencies": {
     "@babel/preset-env": "^7.0.0-beta.54",
@@ -53,7 +54,8 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "phantomjs": "^2.1.7",
     "uglify-es": "^3.3.9",
-    "watchify": "^3.11.0"
+    "watchify": "^3.11.0",
+    "jsdoc-to-markdown": "^4.0.1"
   },
   "files": [
     "src"
