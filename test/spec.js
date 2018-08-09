@@ -81,12 +81,12 @@ describe('Test library', function () {
         it("Signing  method should be defined", function () {
             expect(sp8de.signMessage).toBeDefined();
         });
-        it("Should be return object", function () {
+        it("Should be return string", function () {
             expect(typeof sp8de.signMessage({
                 privateKey: privateKey,
                 seed: 1,
                 nonce: 1
-            })).toEqual('object');
+            })).toEqual('string');
         });
         it("Sign for 0xd9a5e808bc4e2d420aa16bc9069972a9f1ddaec7d2ee10021ae3ad9a899cd0ce,1,1 should be return sign 0x0e3bda0512370a303d9e14921b398d33e4f2eeb934958eea79360ad9e45ccf217d674852126f2978f779ac3f6bfe23190919b949e9e7ca62d4fc1fb3cb968ab31b", function () {
             let privateKey = "0xd9a5e808bc4e2d420aa16bc9069972a9f1ddaec7d2ee10021ae3ad9a899cd0ce";
@@ -94,7 +94,7 @@ describe('Test library', function () {
                 privateKey: privateKey,
                 seed: 1,
                 nonce: 1
-            }).sign).toEqual("0x0e3bda0512370a303d9e14921b398d33e4f2eeb934958eea79360ad9e45ccf217d674852126f2978f779ac3f6bfe23190919b949e9e7ca62d4fc1fb3cb968ab31b");
+            })).toEqual("0x0e3bda0512370a303d9e14921b398d33e4f2eeb934958eea79360ad9e45ccf217d674852126f2978f779ac3f6bfe23190919b949e9e7ca62d4fc1fb3cb968ab31b");
         });
     });
     describe("Validating", function () {
@@ -121,7 +121,7 @@ describe('Test library', function () {
             let privateKey = sp8de.generatePrivateKey(),
                 pubKey = sp8de.getPubKey(privateKey),
                 seed = sp8de.generateSeed(),
-                sign = sp8de.signMessage({privateKey: privateKey, seed: seed, nonce: 1}).sign;
+                sign = sp8de.signMessage({privateKey: privateKey, seed: seed, nonce: 1});
             expect(sp8de.validateSign({
                 sign: sign,
                 pubKey: pubKey,

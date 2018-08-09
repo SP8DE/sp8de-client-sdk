@@ -68,10 +68,10 @@ export class Sp8deClientSDK {
     };
 
     /**
-     * @description Signs a message from privateKey, seed, nonce
+     * @description Signs a message from privateKey, seed, nonce. Returns message signed with private key
      * @memberOf Sp8deClientSDK
      * @param {object} parameters - {privateKey: string, seed: number, nonce: number}
-     * @return {object} Object {pubKey: string, message: string, sign: string, version: string, signer: string}
+     * @return {string} Message signed with private key
      * */
     signMessage(parameters) {
         //
@@ -86,13 +86,7 @@ export class Sp8deClientSDK {
             msg = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
             signed = this.EthJS.ecsign(msg, this.EthJS.toBuffer(parameters.privateKey)),
             tx = signed.r.toString('hex') + signed.s.toString('hex') + this.EthJS.stripHexPrefix(this.EthJS.intToHex(signed.v));
-        return {
-            pubKey: pubKey,
-            message: message,
-            sign: this.EthJS.addHexPrefix(tx),
-            version: '3',
-            signer: 'MEW'
-        };
+        return this.EthJS.addHexPrefix(tx);
     };
 
     /**
