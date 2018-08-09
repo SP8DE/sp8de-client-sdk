@@ -6,18 +6,18 @@ export class Sp8deClientSDK {
         this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
     }
 
-    signMessage(privateKey, seed, nonce) {
+    signMessage(parameters) {
         //
-        if (privateKey === undefined ||
-            seed === undefined ||
-            nonce === undefined) {
-            console.error('Invalid parameters');
+        if (parameters.privateKey === undefined ||
+            parameters.seed === undefined ||
+            parameters.nonce === undefined) {
+            console.error('Invalid parameters', parameters);
             return null;
         }
-        let pubKey = this.getPubKey(privateKey),
-            message = `${pubKey};${seed};${nonce}`,
+        let pubKey = this.getPubKey(parameters.privateKey),
+            message = `${pubKey};${parameters.seed};${parameters.nonce}`,
             msg = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
-            signed = this.EthJS.ecsign(msg, this.EthJS.toBuffer(privateKey)),
+            signed = this.EthJS.ecsign(msg, this.EthJS.toBuffer(parameters.privateKey)),
             tx = signed.r.toString('hex') + signed.s.toString('hex') + this.EthJS.stripHexPrefix(this.EthJS.intToHex(signed.v));
         return {
             pubKey: pubKey,
@@ -36,19 +36,19 @@ export class Sp8deClientSDK {
         return this.EthJS.addHexPrefix(this.EthJS.privateToAddress(privateKey).toString('hex'))
     };
 
-    getRandomFromArray(array, min, max, count) {
+    getRandomFromArray(parameters) {
         let rand = new mt19937(),
             result = [];
-        if (array === undefined ||
-            !Array.isArray(array) ||
-            min === undefined ||
-            max === undefined) {
+        if (parameters.array === undefined ||
+            !Array.isArray(parameters.array) ||
+            parameters.min === undefined ||
+            parameters.max === undefined) {
             console.error('Invalid parameters');
             return;
         }
-        rand.init_by_array(array, array.length);
-        for (let i = 0; i < count; i++) {
-            result.push(this.getRandomIntInclusive(rand.random(), min, max))
+        rand.init_by_array(parameters.array, parameters.array.length);
+        for (let i = 0; i < parameters.count; i++) {
+            result.push(AccessoryFunctions.getRandomIntInclusive(rand.random(), parameters.min, parameters.max))
         }
         return result;
     };
@@ -63,12 +63,12 @@ export class Sp8deClientSDK {
         return this.privateKeyGenerator.Wallet.createRandom().privateKey;
     };
 
-    validate(parameters) {
+    validateSign(parameters) {
         let hash, msg, newPubKey;
         try {
             if (!parameters.sign) throw new TypeError('Empty parameters.sign');
             if (parameters.sign.length % 2 !== 0) throw new TypeError('Invalid hex string');
-            parameters.sign = Buffer.from(this.getNakedAddress(parameters.sign), 'hex');
+            parameters.sign = Buffer.from(AccessoryFunctions.getNakedAddress(parameters.sign), 'hex');
             if (parameters.sign.length !== 65) throw new TypeError('parameters.sign length is not valid');
             parameters.sign[64] = parameters.sign[64] === 0 || parameters.sign[64] === 1 ? parameters.sign[64] + 27 : parameters.sign[64];
             msg = `${parameters.pubKey.toLowerCase()};${parameters.seed};${parameters.nonce}`;
