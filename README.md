@@ -57,29 +57,28 @@ You'll find more detailed information on using `sp8de-client-sdk` and tailoring 
 `toCDN`: Create single file with browserify and minification
 
 ## API
-
 * [Sp8deClientSDK](#Sp8deClientSDK)
     * [.generatePrivateKey()](#Sp8deClientSDK+generatePrivateKey) ⇒ <code>number</code>
     * [.getPubKey(privateKey)](#Sp8deClientSDK+getPubKey) ⇒ <code>string</code>
     * [.getRandomFromArray(parameters)](#Sp8deClientSDK+getRandomFromArray) ⇒ <code>Array.&lt;number&gt;</code>
     * [.generateSeed()](#Sp8deClientSDK+generateSeed) ⇒ <code>number</code>
-    * [.signMessage(parameters)](#Sp8deClientSDK+signMessage) ⇒ <code>object</code>
+    * [.signMessage(parameters)](#Sp8deClientSDK+signMessage) ⇒ <code>string</code>
     * [.validateSign(parameters)](#Sp8deClientSDK+validateSign) ⇒ <code>boolean</code>
 
 <a name="Sp8deClientSDK+generatePrivateKey"></a>
 
 ### sp8deClientSDK.generatePrivateKey() ⇒ <code>number</code>
-Returns new private key
+Returns a new private key
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
-**Returns**: <code>number</code> - Array contains random numbers
+**Returns**: <code>number</code> - A public key of 66 characters long
 <a name="Sp8deClientSDK+getPubKey"></a>
 
 ### sp8deClientSDK.getPubKey(privateKey) ⇒ <code>string</code>
-Returns public key for private key
+Returns the public key obtains from the private key
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
-**Returns**: <code>string</code> - Public key
+**Returns**: <code>string</code> - A public key of 42 characters long
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -91,7 +90,7 @@ Returns public key for private key
 Returns an array of random numbers from seed-array (use mt19937 algorithm)
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
-**Returns**: <code>Array.&lt;number&gt;</code> - Array contains random numbers
+**Returns**: <code>Array.&lt;number&gt;</code> - An array of length given by a "count" containing random numbers
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -103,14 +102,14 @@ Returns an array of random numbers from seed-array (use mt19937 algorithm)
 Returns a random number to use as a seed
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
-**Returns**: <code>number</code> - Random seed
+**Returns**: <code>number</code> - Random seed number. Length 9-10
 <a name="Sp8deClientSDK+signMessage"></a>
 
-### sp8deClientSDK.signMessage(parameters) ⇒ <code>object</code>
-Signs a message from privateKey, seed, nonce
+### sp8deClientSDK.signMessage(parameters) ⇒ <code>string</code>
+Signs a message from privateKey, seed, nonce. Returns message signed with private key.
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
-**Returns**: <code>object</code> - Object {pubKey: string, message: string, sign: string, version: string, signer: string}
+**Returns**: <code>string</code> - Message signed with private key
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -127,4 +126,3 @@ Validates the message. Use sign, nonce, public key and seed. Returns true if the
 | Param | Type | Description |
 | --- | --- | --- |
 | parameters | <code>object</code> | {sign: string, pubKey: string, seed: number, nonce: number} |
-
