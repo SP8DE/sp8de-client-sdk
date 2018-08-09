@@ -1,11 +1,78 @@
 let Buffer = require('buffer').Buffer;
 
+/**
+ * @class Sp8deClientSDK
+ * @constructor
+ * */
 export class Sp8deClientSDK {
     constructor(eth = undefined, privateKeyGenerator = undefined) {
         this.EthJS = !eth ? window.EthJS.Util : eth;
         this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
     }
 
+    /**
+     * @description Returns new private key
+     * @memberOf Sp8deClientSDK
+     * @return {number} Array contains random numbers
+     * */
+    generatePrivateKey() {
+        return this.privateKeyGenerator.Wallet.createRandom().privateKey;
+    };
+
+    /**
+     * @description Returns public key for private key
+     * @memberOf Sp8deClientSDK
+     * @param {string} privateKey - private key
+     * @return {string} Public key
+     * */
+    getPubKey(privateKey) {
+        if (!privateKey) {
+            console.error('Invalid parameter');
+            return;
+        }
+        return this.EthJS.addHexPrefix(this.EthJS.privateToAddress(privateKey).toString('hex'))
+    };
+
+    /**
+     * @description Returns an array of random numbers from seed-array (use mt19937 algorithm)
+     * @memberOf Sp8deClientSDK
+     * @param {object} parameters - {array: [], min: number, max: number, count: number}
+     * @return {number[]} Array contains random numbers
+     * */
+    getRandomFromArray(parameters) {
+        let rand = new mt19937(),
+            result = [];
+        if (parameters.array === undefined ||
+            !Array.isArray(parameters.array) ||
+            parameters.min === undefined ||
+            parameters.max === undefined) {
+            console.error('Invalid parameters');
+            return;
+        }
+        rand.init_by_array(parameters.array, parameters.array.length);
+        for (let i = 0; i < parameters.count; i++) {
+            result.push(AccessoryFunctions.getRandomIntInclusive(rand.random(), parameters.min, parameters.max))
+        }
+        return result;
+    };
+
+    /**
+     * @description Returns a random number to use as a seed
+     * @memberOf Sp8deClientSDK
+     * @return {number} Random seed
+     * */
+    generateSeed() {
+        let rnd = new Uint32Array(1);
+        window.crypto.getRandomValues(rnd);
+        return rnd[0];
+    };
+
+    /**
+     * @description Signs a message from privateKey, seed, nonce
+     * @memberOf Sp8deClientSDK
+     * @param {object} parameters - {privateKey: string, seed: number, nonce: number}
+     * @return {object} Object {pubKey: string, message: string, sign: string, version: string, signer: string}
+     * */
     signMessage(parameters) {
         //
         if (parameters.privateKey === undefined ||
@@ -28,41 +95,12 @@ export class Sp8deClientSDK {
         };
     };
 
-    getPubKey(privateKey) {
-        if (!privateKey) {
-            console.error('Invalid parameter');
-            return;
-        }
-        return this.EthJS.addHexPrefix(this.EthJS.privateToAddress(privateKey).toString('hex'))
-    };
-
-    getRandomFromArray(parameters) {
-        let rand = new mt19937(),
-            result = [];
-        if (parameters.array === undefined ||
-            !Array.isArray(parameters.array) ||
-            parameters.min === undefined ||
-            parameters.max === undefined) {
-            console.error('Invalid parameters');
-            return;
-        }
-        rand.init_by_array(parameters.array, parameters.array.length);
-        for (let i = 0; i < parameters.count; i++) {
-            result.push(AccessoryFunctions.getRandomIntInclusive(rand.random(), parameters.min, parameters.max))
-        }
-        return result;
-    };
-
-    generateSeed() {
-        let rnd = new Uint32Array(1);
-        window.crypto.getRandomValues(rnd);
-        return rnd[0];
-    };
-
-    generatePrivateKey() {
-        return this.privateKeyGenerator.Wallet.createRandom().privateKey;
-    };
-
+    /**
+     * @description Validates the message. Use sign, nonce, public key and seed. Returns true if the validation was successful.
+     * @memberOf Sp8deClientSDK
+     * @param {object} parameters - {sign: string, pubKey: string, seed: number, nonce: number}
+     * @return {boolean} True if successful, false if unsuccessful
+     * */
     validateSign(parameters) {
         let hash, msg, newPubKey;
         try {
