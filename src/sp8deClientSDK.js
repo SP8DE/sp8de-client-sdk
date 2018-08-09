@@ -11,19 +11,19 @@ export class Sp8deClientSDK {
     }
 
     /**
-     * @description Returns new private key
+     * @description Returns a new private key
      * @memberOf Sp8deClientSDK
-     * @return {number} Array contains random numbers
+     * @return {number} A public key of 66 characters long
      * */
     generatePrivateKey() {
         return this.privateKeyGenerator.Wallet.createRandom().privateKey;
     };
 
     /**
-     * @description Returns public key for private key
+     * @description Returns the public key obtains from the private key
      * @memberOf Sp8deClientSDK
      * @param {string} privateKey - private key
-     * @return {string} Public key
+     * @return {string} A public key of 42 characters long
      * */
     getPubKey(privateKey) {
         if (!privateKey) {
@@ -37,7 +37,7 @@ export class Sp8deClientSDK {
      * @description Returns an array of random numbers from seed-array (use mt19937 algorithm)
      * @memberOf Sp8deClientSDK
      * @param {object} parameters - {array: [], min: number, max: number, count: number}
-     * @return {number[]} Array contains random numbers
+     * @return {number[]} An array of length given by a "count" containing random numbers
      * */
     getRandomFromArray(parameters) {
         let rand = new mt19937(),
@@ -59,7 +59,7 @@ export class Sp8deClientSDK {
     /**
      * @description Returns a random number to use as a seed
      * @memberOf Sp8deClientSDK
-     * @return {number} Random seed
+     * @return {number} Random seed number. Length 9-10
      * */
     generateSeed() {
         let rnd = new Uint32Array(1);
@@ -68,13 +68,12 @@ export class Sp8deClientSDK {
     };
 
     /**
-     * @description Signs a message from privateKey, seed, nonce. Returns message signed with private key
+     * @description Signs a message from privateKey, seed, nonce. Returns message signed with private key.
      * @memberOf Sp8deClientSDK
      * @param {object} parameters - {privateKey: string, seed: number, nonce: number}
      * @return {string} Message signed with private key
      * */
     signMessage(parameters) {
-        //
         if (parameters.privateKey === undefined ||
             parameters.seed === undefined ||
             parameters.nonce === undefined) {
