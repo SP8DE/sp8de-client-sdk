@@ -6,14 +6,6 @@ describe('Test library', function () {
             expect(sp8de).toBeDefined();
         });
     });
-    describe("Removing 0x", function () {
-        it("Method getNakedAddress() should be defined", function () {
-            expect(sp8de.getNakedAddress).toBeDefined();
-        });
-        it("Method getNakedAddress() should be slice 0x from string", function () {
-            expect(~sp8de.getNakedAddress(sp8de.generatePrivateKey()).indexOf('0x')).toBeFalsy();
-        });
-    });
     describe("Generating seed", function () {
         it("Method generateSeed() should be defined", function () {
             expect(sp8de.generateSeed).toBeDefined();
