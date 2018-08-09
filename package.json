@@ -14,7 +14,7 @@
   ],
   "author": "Pavel Zubov",
   "scripts": {
-    "test": "Jasmine",
+    "test": "karma start",
     "watch": "watchify cdn/script.js -o js/script.js -v",
     "toCDN": "browserify cdn/script.js | uglifyjs > js/script.js",
     "prepublishOnly": "browserify cdn/script.js > js/script.js"
