@@ -8,7 +8,7 @@ SDK for client
 ```
 npm install sp8de-client-sdk
 ```
-For angular2+ apps need add  links to cryptography libraries to index.html:
+For angular2 + applications, you need to add references to cryptographic libraries to the index.html file:
 ```
 <script src="https://www.mobilefish.com/scripts/ethereumjs/ethereumjs-util.js"></script>
 <script src="https://cdn.ethers.io/scripts/ethers-v3.min.js"></script>
@@ -27,7 +27,7 @@ const Sp8deClientSDK = require('sp8de-client-sdk');
 
 const sp8deClientSDK = new Sp8deClientSDK();
 
-const see d = sp8deClientSDK.generateSeed();
+const seed = sp8deClientSDK.generateSeed();
 // returns seed
 ```
 ### CDN
@@ -59,6 +59,10 @@ You'll find more detailed information on using `sp8de-client-sdk` and tailoring 
 
 ## NPM commands
 
+`doc`: Run generate documentation from jsdoc
+
 `test`: Run karma test
+
 `watch`: Run watchify to autorun browserify for create single file
+
 `toCDN`: Create single file with browserify and minification
