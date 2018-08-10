@@ -329,6 +329,7 @@ describe('Test library', function () {
                         expect(typeof decryptRes).toBe('object');
                         expect(decryptRes.privateKey).toBeDefined();
                         expect(decryptRes.privateKey).toBe(privateKey);
+                        localStorage.clear();
                         done();
                     })
                 });
