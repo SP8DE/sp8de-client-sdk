@@ -25,16 +25,19 @@ import {Sp8deClientSDK} from 'sp8de-client-sdk';
 // or
 const Sp8deClientSDK = require('sp8de-client-sdk');
 
-const sp8deClientSDK = new Sp8deClientSDK();
+const sp8deClientSDK = new Sp8deClientSDK.Methods();
 
 const seed = sp8deClientSDK.generateSeed();
 // returns seed
 ```
 ### CDN
 ```js
-const see d = sp8deClientSDK.generateSeed();
+const seed = sp8deClientSDK.generateSeed();
 // returns seed
 ```
+
+### Store wallets in localstorage
+Methods for storing wallet in the storage use the choice between `wallets` and `user` keys in localstorage (for situations where the user-object in the application)
 
 ## About
 
