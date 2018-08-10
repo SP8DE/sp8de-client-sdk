@@ -11,7 +11,6 @@ export class Sp8deClientSDK {
         this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
     }
 
-
     /**
      * @description Returns a new private key
      * @memberOf Sp8deClientSDK
@@ -20,7 +19,6 @@ export class Sp8deClientSDK {
     generatePrivateKey() {
         return this.privateKeyGenerator.Wallet.createRandom().privateKey;
     };
-
 
     /**
      * @description Returns a new wallet
