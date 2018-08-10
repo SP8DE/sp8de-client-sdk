@@ -1,6 +1,5 @@
 let Buffer = require('buffer').Buffer,
     nameKeysField = 'Wallets',
-    wallet = require('eth-lightwallet'),
     namUserField = 'user';
 
 /**
