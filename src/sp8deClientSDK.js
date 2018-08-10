@@ -1,4 +1,6 @@
-let Buffer = require('buffer').Buffer;
+let Buffer = require('buffer').Buffer,
+    nameKeysField = 'privateKeys',
+    namUserField = 'user';
 
 /**
  * @class Sp8deClientSDK
@@ -9,7 +11,6 @@ export class Sp8deClientSDK {
         this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
     }
 
-    nameField = 'privateKeys';
 
     /**
      * @description Returns a new private key
@@ -128,19 +129,19 @@ export class Sp8deClientSDK {
      * @param value {string} Private key
      */
     addPrivateKeyToStorage(value) {
-        let user = this.getUserInStorage(), privateKeys = [];
-        if (user) {
-            if (!user[this.nameField]) {
-                user[this.nameField] = [];
+        let storageKeys = this.getKeysInStorage(), privateKeys = [];
+        if (Array.isArray(storageKeys)) {
+            storageKeys.push(value);
+            localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
+        } else if (storageKeys) {
+            if (!storageKeys[nameKeysField]) {
+                storageKeys[nameKeysField] = [];
             }
-            user[this.nameField].push(value);
-            localStorage.setItem('user', JSON.stringify(user));
+            storageKeys[nameKeysField].push(value);
+            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
         } else {
-            if (localStorage.getItem(this.nameField)) {
-                privateKeys = JSON.parse(localStorage.getItem(this.nameField));
-            }
             privateKeys.push(value);
-            localStorage.setItem(this.nameField, JSON.stringify(privateKeys));
+            localStorage.setItem(nameKeysField, JSON.stringify(privateKeys));
         }
     }
 
@@ -148,15 +149,14 @@ export class Sp8deClientSDK {
      * @description Removing last private key from array in localstorage
      */
     removeLastPrivateKeyFromStorage() {
-        let user = this.getUserInStorage(), privateKeys = [];
-        if (!this.isKeysInStorage(user)) return;
-        if (user) {
-            user[this.nameField].pop();
-            localStorage.setItem('user', JSON.stringify(user));
+        let storageKeys = this.getKeysInStorage();
+        if (!this.isKeysInStorage(storageKeys)) return;
+        if (Array.isArray(storageKeys)) {
+            storageKeys.pop();
+            localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
         } else {
-            privateKeys = JSON.parse(localStorage.getItem(this.nameField));
-            privateKeys.pop();
-            localStorage.setItem(this.nameField, JSON.stringify(privateKeys));
+            storageKeys[nameKeysField].pop();
+            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
         }
     }
 
@@ -164,12 +164,12 @@ export class Sp8deClientSDK {
      * @description Clear array of private keys (delete key from localstorage)
      */
     clearPrivateKeyStorage() {
-        let user = this.getUserInStorage();
-        if (user) {
-            delete user[this.nameField];
-            localStorage.setItem('user', JSON.stringify(user));
+        let storageKeys = this.getKeysInStorage();
+        if (Array.isArray(storageKeys)){
+            localStorage.removeItem(nameKeysField);
         } else {
-            localStorage.removeItem(this.nameField);
+            delete storageKeys[nameKeysField];
+            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
         }
     }
 
@@ -187,14 +187,13 @@ export class Sp8deClientSDK {
      * @return {string[]} Array of private keys or null if no array
      */
     getPrivateKeysListFromStorage() {
-        let user = this.getUserInStorage(), privateKeys = [];
-        if (!this.isKeysInStorage(user)) return null;
-        if (user) {
-            return user[this.nameField];
-        } else {
-            privateKeys = JSON.parse(localStorage.getItem(this.nameField));
-            return privateKeys;
-        }
+        let storageKeys = this.getKeysInStorage();
+        if (!this.isKeysInStorage(storageKeys)) return null;
+        if (Array.isArray(storageKeys)) {
+            return storageKeys;
+        } else if (storageKeys) {
+            return storageKeys[nameKeysField];
+        } else return null;
     }
 
     /**
@@ -202,21 +201,20 @@ export class Sp8deClientSDK {
      * @return {boolean} True if there is, false is not
      * @param {object} user - User in storage, if it there is
      */
-    isKeysInStorage(user) {
-        let privateKeys = [];
-        if (user) {
-            if (!user[this.nameField] || !!!user[this.nameField].length) return false;
+    isKeysInStorage(storageKeys) {
+        if (!storageKeys) return false;
+        if (Array.isArray(storageKeys)) {
+            if (!!!storageKeys.length) return false;
         } else {
-            if (!!!localStorage.getItem(this.nameField)) return false;
-            privateKeys = JSON.parse(localStorage.getItem(this.nameField));
-            if (!!!privateKeys.length) return false;
+            if (!storageKeys[nameKeysField] || !!!storageKeys[nameKeysField].length) return false;
         }
         return true;
     }
 
-    getUserInStorage() {
-        const user = JSON.parse(localStorage.getItem('user'));
-        return user ? user : null;
+    getKeysInStorage() {
+        const storageKeys = JSON.parse(localStorage.getItem(namUserField)),
+            privateKeys = localStorage.getItem(nameKeysField) ? JSON.parse(localStorage.getItem(nameKeysField)) : null;
+        return storageKeys ? storageKeys : privateKeys;
     }
 
     getTrezorHash(msg) {
