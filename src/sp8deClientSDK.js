@@ -1,5 +1,6 @@
 let Buffer = require('buffer').Buffer,
-    nameKeysField = 'privateKeys',
+    nameKeysField = 'Wallets',
+    wallet = require('eth-lightwallet'),
     namUserField = 'user';
 
 /**
@@ -19,6 +20,38 @@ export class Sp8deClientSDK {
      * */
     generatePrivateKey() {
         return this.privateKeyGenerator.Wallet.createRandom().privateKey;
+    };
+
+
+    /**
+     * @description Returns a new wallet
+     * @memberOf Sp8deClientSDK
+     * @return {object} Object contains wallet
+     * */
+    generateWallet() {
+        return this.privateKeyGenerator.Wallet.createRandom();
+    };
+
+    /**
+     * @description Returns a new wallet
+     * @memberOf Sp8deClientSDK
+     * @param {object} wallet - object with wallet
+     * @param {string} password
+     * @return {promise} promise with json
+     * */
+    encryptWallet(wallet, password) {
+        return wallet.encrypt(password);
+    };
+
+    /**
+     * @description Returns a new wallet
+     * @memberOf Sp8deClientSDK
+     * @param {string}  wallet - Encrypted JSON with wallet
+     * @param {string} password
+     * @return {promise} promise with json
+     * */
+    decryptWallet(wallet, password) {
+        return this.privateKeyGenerator.Wallet.fromEncryptedWallet(wallet, password);
     };
 
     /**
@@ -125,11 +158,11 @@ export class Sp8deClientSDK {
     };
 
     /**
-     * @description Add to localstorage to key privateKeys in key "User" or root. If user without field "privateKeys" add it.
+     * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
      */
-    addPrivateKeyToStorage(value) {
-        let storageKeys = this.getKeysInStorage(), privateKeys = [];
+    addWalletToStorage(value) {
+        let storageKeys = this.getWalletsInStorage();
         if (Array.isArray(storageKeys)) {
             storageKeys.push(value);
             localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
@@ -140,16 +173,15 @@ export class Sp8deClientSDK {
             storageKeys[nameKeysField].push(value);
             localStorage.setItem(namUserField, JSON.stringify(storageKeys));
         } else {
-            privateKeys.push(value);
-            localStorage.setItem(nameKeysField, JSON.stringify(privateKeys));
+            localStorage.setItem(nameKeysField, JSON.stringify([value]));
         }
     }
 
     /**
      * @description Removing last private key from array in localstorage
      */
-    removeLastPrivateKeyFromStorage() {
-        let storageKeys = this.getKeysInStorage();
+    removeLastWalletFromStorage() {
+        let storageKeys = this.getWalletsInStorage();
         if (!this.isKeysInStorage(storageKeys)) return;
         if (Array.isArray(storageKeys)) {
             storageKeys.pop();
@@ -163,9 +195,9 @@ export class Sp8deClientSDK {
     /**
      * @description Clear array of private keys (delete key from localstorage)
      */
-    clearPrivateKeyStorage() {
-        let storageKeys = this.getKeysInStorage();
-        if (Array.isArray(storageKeys)){
+    clearWalletStorage() {
+        let storageKeys = this.getWalletsInStorage();
+        if (Array.isArray(storageKeys)) {
             localStorage.removeItem(nameKeysField);
         } else {
             delete storageKeys[nameKeysField];
@@ -177,8 +209,8 @@ export class Sp8deClientSDK {
      * @description Returns active private key in localstorage
      * @returns {string} Active private key or null if no array
      */
-    getActivePrivateKeyFromStorage() {
-        let array = this.getPrivateKeysListFromStorage();
+    getActiveWalletFromStorage() {
+        let array = this.getWalletsListFromStorage();
         return array ? array.pop() : null;
     }
 
@@ -186,8 +218,8 @@ export class Sp8deClientSDK {
      * @description Returns array of string contains all private keys from localstorage
      * @return {string[]} Array of private keys or null if no array
      */
-    getPrivateKeysListFromStorage() {
-        let storageKeys = this.getKeysInStorage();
+    getWalletsListFromStorage() {
+        let storageKeys = this.getWalletsInStorage();
         if (!this.isKeysInStorage(storageKeys)) return null;
         if (Array.isArray(storageKeys)) {
             return storageKeys;
@@ -199,7 +231,7 @@ export class Sp8deClientSDK {
     /**
      * @description  Check if there are keys in vault
      * @return {boolean} True if there is, false is not
-     * @param {object} user - User in storage, if it there is
+     * @param {object} storageKeys - User in storage, if it there is
      */
     isKeysInStorage(storageKeys) {
         if (!storageKeys) return false;
@@ -211,10 +243,10 @@ export class Sp8deClientSDK {
         return true;
     }
 
-    getKeysInStorage() {
-        const storageKeys = JSON.parse(localStorage.getItem(namUserField)),
-            privateKeys = localStorage.getItem(nameKeysField) ? JSON.parse(localStorage.getItem(nameKeysField)) : null;
-        return storageKeys ? storageKeys : privateKeys;
+    getWalletsInStorage() {
+        const userKeys = JSON.parse(localStorage.getItem(namUserField)),
+            Wallets = localStorage.getItem(nameKeysField) ? JSON.parse(localStorage.getItem(nameKeysField)) : null;
+        return userKeys ? userKeys : Wallets;
     }
 
     getTrezorHash(msg) {
