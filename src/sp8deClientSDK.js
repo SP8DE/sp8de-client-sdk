@@ -37,7 +37,7 @@ export class Sp8deClientSDK {
     /**
      * @description Returns an array of random numbers from seed-array (use mt19937 algorithm)
      * @memberOf Sp8deClientSDK
-     * @param {{array: [], min: number, max: number, count: number}} parameters - {array: [], min: number, max: number, count: number}
+     * @param {{array: array, min: number, max: number, count: number}} parameters - {array: [], min: number, max: number, count: number}
      * @return {number[]} An array of length given by a "count" containing random numbers
      * */
     getRandomFromArray(parameters) {
