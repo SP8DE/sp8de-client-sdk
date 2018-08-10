@@ -58,26 +58,60 @@ You'll find more detailed information on using `sp8de-client-sdk` and tailoring 
 
 ## API
 * [Sp8deClientSDK](#Sp8deClientSDK)
-  * [.generatePrivateKey()](#Sp8deClientSDK+generatePrivateKey) ⇒ <code>number</code>
-  * [.getPubKey(privateKey)](#Sp8deClientSDK+getPubKey) ⇒ <code>string</code>
-  * [.getRandomFromArray(parameters)](#Sp8deClientSDK+getRandomFromArray) ⇒ <code>Array.&lt;number&gt;</code>
-  * [.generateSeed()](#Sp8deClientSDK+generateSeed) ⇒ <code>number</code>
-  * [.signMessage(parameters)](#Sp8deClientSDK+signMessage) ⇒ <code>string</code>
-  * [.validateSign(parameters)](#Sp8deClientSDK+validateSign) ⇒ <code>boolean</code>
-  * [.addPrivateKeyToStorage(value)](#Sp8deClientSDK+addPrivateKeyToStorage)
-  * [.removeLastPrivateKeyFromStorage()](#Sp8deClientSDK+removeLastPrivateKeyFromStorage)
-  * [.clearPrivateKeyStorage()](#Sp8deClientSDK+clearPrivateKeyStorage)
-  * [.getActivePrivateKeyFromStorage()](#Sp8deClientSDK+getActivePrivateKeyFromStorage) ⇒ <code>string</code>
-  * [.getPrivateKeysListFromStorage()](#Sp8deClientSDK+getPrivateKeysListFromStorage) ⇒ <code>Array.&lt;string&gt;</code>
-  * [.isKeysInStorage(user)](#Sp8deClientSDK+isKeysInStorage) ⇒ <code>boolean</code>
-
-<a name="Sp8deClientSDK+generatePrivateKey"></a>
+    * [.generatePrivateKey()](#Sp8deClientSDK+generatePrivateKey) ⇒ <code>number</code>
+    * [.generateWallet()](#Sp8deClientSDK+generateWallet) ⇒ <code>object</code>
+    * [.encryptWallet(wallet, password)](#Sp8deClientSDK+encryptWallet) ⇒ <code>promise</code>
+    * [.decryptWallet(wallet, password)](#Sp8deClientSDK+decryptWallet) ⇒ <code>promise</code>
+    * [.getPubKey(privateKey)](#Sp8deClientSDK+getPubKey) ⇒ <code>string</code>
+    * [.getRandomFromArray(parameters)](#Sp8deClientSDK+getRandomFromArray) ⇒ <code>Array.&lt;number&gt;</code>
+    * [.generateSeed()](#Sp8deClientSDK+generateSeed) ⇒ <code>number</code>
+    * [.signMessage(parameters)](#Sp8deClientSDK+signMessage) ⇒ <code>string</code>
+    * [.validateSign(parameters)](#Sp8deClientSDK+validateSign) ⇒ <code>boolean</code>
+    * [.addWalletToStorage(value)](#Sp8deClientSDK+addWalletToStorage)
+    * [.removeLastWalletFromStorage()](#Sp8deClientSDK+removeLastWalletFromStorage)
+    * [.clearWalletStorage()](#Sp8deClientSDK+clearWalletStorage)
+    * [.getActiveWalletFromStorage()](#Sp8deClientSDK+getActiveWalletFromStorage) ⇒ <code>string</code>
+    * [.getWalletsListFromStorage()](#Sp8deClientSDK+getWalletsListFromStorage) ⇒ <code>Array.&lt;string&gt;</code>
+    * [.isKeysInStorage(storageKeys)](#Sp8deClientSDK+isKeysInStorage) ⇒ <code>boolean</code>
 
 ### sp8deClientSDK.generatePrivateKey() ⇒ <code>number</code>
 Returns a new private key
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
 **Returns**: <code>number</code> - A public key of 66 characters long
+<a name="Sp8deClientSDK+generateWallet"></a>
+
+### sp8deClientSDK.generateWallet() ⇒ <code>object</code>
+Returns a new wallet
+
+**Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
+**Returns**: <code>object</code> - Object contains wallet
+<a name="Sp8deClientSDK+encryptWallet"></a>
+
+### sp8deClientSDK.encryptWallet(wallet, password) ⇒ <code>promise</code>
+Returns a new wallet
+
+**Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
+**Returns**: <code>promise</code> - promise with json
+
+| Param | Type | Description |
+| --- | --- | --- |
+| wallet | <code>object</code> | object with wallet |
+| password | <code>string</code> |  |
+
+<a name="Sp8deClientSDK+decryptWallet"></a>
+
+### sp8deClientSDK.decryptWallet(wallet, password) ⇒ <code>promise</code>
+Returns a new wallet
+
+**Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
+**Returns**: <code>promise</code> - promise with json
+
+| Param | Type | Description |
+| --- | --- | --- |
+| wallet | <code>string</code> | Encrypted JSON with wallet |
+| password | <code>string</code> |  |
+
 <a name="Sp8deClientSDK+getPubKey"></a>
 
 ### sp8deClientSDK.getPubKey(privateKey) ⇒ <code>string</code>
@@ -133,10 +167,10 @@ Validates the message. Use sign, nonce, public key and seed. Returns true if the
 | --- | --- | --- |
 | parameters | <code>Object</code> | {sign: string, pubKey: string, seed: number, nonce: number} |
 
-<a name="Sp8deClientSDK+addPrivateKeyToStorage"></a>
+<a name="Sp8deClientSDK+addWalletToStorage"></a>
 
-### sp8deClientSDK.addPrivateKeyToStorage(value)
-Add to localstorage to key privateKeys in key "User" or root. If user without field "privateKeys" add it.
+### sp8deClientSDK.addWalletToStorage(value)
+Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
 
@@ -144,35 +178,35 @@ Add to localstorage to key privateKeys in key "User" or root. If user without fi
 | --- | --- | --- |
 | value | <code>string</code> | Private key |
 
-<a name="Sp8deClientSDK+removeLastPrivateKeyFromStorage"></a>
+<a name="Sp8deClientSDK+removeLastWalletFromStorage"></a>
 
-### sp8deClientSDK.removeLastPrivateKeyFromStorage()
+### sp8deClientSDK.removeLastWalletFromStorage()
 Removing last private key from array in localstorage
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
-<a name="Sp8deClientSDK+clearPrivateKeyStorage"></a>
+<a name="Sp8deClientSDK+clearWalletStorage"></a>
 
-### sp8deClientSDK.clearPrivateKeyStorage()
+### sp8deClientSDK.clearWalletStorage()
 Clear array of private keys (delete key from localstorage)
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
-<a name="Sp8deClientSDK+getActivePrivateKeyFromStorage"></a>
+<a name="Sp8deClientSDK+getActiveWalletFromStorage"></a>
 
-### sp8deClientSDK.getActivePrivateKeyFromStorage() ⇒ <code>string</code>
+### sp8deClientSDK.getActiveWalletFromStorage() ⇒ <code>string</code>
 Returns active private key in localstorage
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
 **Returns**: <code>string</code> - Active private key or null if no array
-<a name="Sp8deClientSDK+getPrivateKeysListFromStorage"></a>
+<a name="Sp8deClientSDK+getWalletsListFromStorage"></a>
 
-### sp8deClientSDK.getPrivateKeysListFromStorage() ⇒ <code>Array.&lt;string&gt;</code>
+### sp8deClientSDK.getWalletsListFromStorage() ⇒ <code>Array.&lt;string&gt;</code>
 Returns array of string contains all private keys from localstorage
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
 **Returns**: <code>Array.&lt;string&gt;</code> - Array of private keys or null if no array
 <a name="Sp8deClientSDK+isKeysInStorage"></a>
 
-### sp8deClientSDK.isKeysInStorage(user) ⇒ <code>boolean</code>
+### sp8deClientSDK.isKeysInStorage(storageKeys) ⇒ <code>boolean</code>
 Check if there are keys in vault
 
 **Kind**: instance method of [<code>Sp8deClientSDK</code>](#Sp8deClientSDK)
@@ -180,4 +214,5 @@ Check if there are keys in vault
 
 | Param | Type | Description |
 | --- | --- | --- |
-| user | <code>object</code> | User in storage, if it there is |
+| storageKeys | <code>object</code> | User in storage, if it there is |
+
