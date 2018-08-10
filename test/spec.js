@@ -130,4 +130,192 @@ describe('Test library', function () {
             })).toBe(true);
         });
     });
+    describe("Local storage", function () {
+        let nameField = 'privateKeys';
+        describe("Add", function () {
+            it("addPrivateKeyToStorage method to be defined", function () {
+                expect(sp8de.addPrivateKeyToStorage).toBeDefined();
+            });
+            it("addPrivateKeyToStorage should be added 100 keys", function () {
+                const count = 100;
+                for (let i = 0; i < count; i++) {
+                    sp8de.addPrivateKeyToStorage('0xd9a5e808bc4e2d420aa16bc9069972a9f1ddaec7d2ee10021ae3ad9a899cd0ce');
+                }
+                expect(JSON.parse(localStorage.getItem(nameField)).length).toBe(count);
+                localStorage.clear();
+            });
+            it("addPrivateKeyToStorage() should be add private key to storage", function () {
+                let key = '1234';
+                sp8de.addPrivateKeyToStorage(key);
+                expect(JSON.parse(localStorage.getItem(nameField)).pop()).toEqual(key);
+                localStorage.clear();
+            });
+            it("addPrivateKeyToStorage() should be add private key to storage with user", function () {
+                let key = '1234';
+                localStorage.setItem('user', JSON.stringify({name: 'name'}));
+                sp8de.addPrivateKeyToStorage(key);
+                expect(JSON.parse(localStorage.getItem('user')).privateKeys.pop()).toEqual(key);
+                localStorage.clear();
+            });
+        })
+        describe("Remove", function () {
+            it("removeLastPrivateKeyFromStorage method to be defined", function () {
+                expect(sp8de.removeLastPrivateKeyFromStorage).toBeDefined();
+            });
+            it("clearPrivateKeyStorage method to be defined", function () {
+                expect(sp8de.clearPrivateKeyStorage).toBeDefined();
+            });
+            it("removeLastPrivateKeyFromStorage() should be remove last private key from storage", function () {
+                let keyFirst = '1234',
+                    keySecond = '4321';
+                sp8de.addPrivateKeyToStorage(keyFirst);
+                sp8de.addPrivateKeyToStorage(keySecond);
+                sp8de.removeLastPrivateKeyFromStorage();
+                expect(JSON.parse(localStorage.getItem(nameField)).pop()).toEqual(keyFirst);
+                localStorage.clear();
+            });
+            it("clearPrivateKeyStorage() should be remove all array of private keys", function () {
+                let keyFirst = '1234',
+                    keySecond = '4321',
+                    user = {name: 'name',privateKeys:[1,2,3,4]};
+                sp8de.addPrivateKeyToStorage(keyFirst);
+                sp8de.clearPrivateKeyStorage();
+                expect(JSON.parse(localStorage.getItem(nameField))).toBeNull();
+                localStorage.setItem('user', JSON.stringify(user));
+                sp8de.clearPrivateKeyStorage();
+                expect(JSON.parse(localStorage.getItem('user')).privateKeys).toBeUndefined();
+                localStorage.clear();
+            });
+            it("removeLastPrivateKeyFromStorage() should be return if privateKeys empty or undefined", function () {
+                let user = {name: 'name'};
+                localStorage.setItem('user', JSON.stringify(user));
+                sp8de.removeLastPrivateKeyFromStorage();
+                expect(JSON.parse(localStorage.getItem('user'))).toEqual(user);
+                user = {name: 'name', privateKeys: []};
+                localStorage.setItem('user', JSON.stringify(user));
+                sp8de.removeLastPrivateKeyFromStorage();
+                expect(JSON.parse(localStorage.getItem('user'))).toEqual(user);
+                localStorage.clear();
+                localStorage.setItem(nameField, JSON.stringify([]));
+                sp8de.removeLastPrivateKeyFromStorage();
+                expect(JSON.parse(localStorage.getItem(nameField))).toEqual([]);
+            });
+            it("removeLastPrivateKeyFromStorage() should be remove last private key from storage with user", function () {
+                let keyFirst = '1234',
+                    keySecond = '4321';
+                localStorage.setItem('user', JSON.stringify({name: 'name'}));
+                sp8de.addPrivateKeyToStorage(keyFirst);
+                sp8de.addPrivateKeyToStorage(keySecond);
+                sp8de.removeLastPrivateKeyFromStorage();
+                expect(JSON.parse(localStorage.getItem('user')).privateKeys.pop()).toEqual(keyFirst);
+                localStorage.clear();
+            });
+        });
+        describe("Get", function () {
+            it("getActivePrivateKeyFromStorage method to be defined", function () {
+                expect(sp8de.getActivePrivateKeyFromStorage).toBeDefined();
+            });
+            it("getActivePrivateKeyFromStorage() should be get active private key from storage", function () {
+                let keyFirst = '1234',
+                    keySecond = '4321';
+                sp8de.addPrivateKeyToStorage(keyFirst);
+                sp8de.addPrivateKeyToStorage(keySecond);
+                expect(sp8de.getActivePrivateKeyFromStorage()).toEqual(keySecond);
+                localStorage.clear();
+            });
+            it("getActivePrivateKeyFromStorage() should be get active private key from storage with user", function () {
+                let user = {name: 'name'},
+                    key = '1234';
+                localStorage.setItem('user', JSON.stringify(user));
+                sp8de.addPrivateKeyToStorage(key);
+                expect(sp8de.getActivePrivateKeyFromStorage()).toEqual(key);
+                localStorage.clear();
+            });
+            it("getActivePrivateKeyFromStorage() should be return NULL if privateKeys empty or undefined", function () {
+                let user = {name: 'name'};
+                expect(sp8de.getActivePrivateKeyFromStorage()).toBeNull();
+                localStorage.setItem('user', JSON.stringify(user));
+                expect(sp8de.getActivePrivateKeyFromStorage()).toBeNull();
+                user = {name: 'name', privateKeys: []};
+                localStorage.setItem('user', JSON.stringify(user));
+                expect(sp8de.getActivePrivateKeyFromStorage()).toBeNull();
+                localStorage.clear();
+                localStorage.setItem(nameField, JSON.stringify([]));
+                expect(sp8de.getActivePrivateKeyFromStorage()).toBeNull();
+                localStorage.clear();
+            });
+            it("getPrivateKeysListFromStorage method to be defined", function () {
+                expect(sp8de.getPrivateKeysListFromStorage()).toBeDefined();
+            });
+            it("getPrivateKeysListFromStorage() should be get array of added private keys", function () {
+                let keys = ['1234', '4321', '5678', '8765'];
+                for (let i = 0; i < keys.length; i++) {
+                    sp8de.addPrivateKeyToStorage(keys[i]);
+                }
+                expect(sp8de.getPrivateKeysListFromStorage()).toEqual(keys);
+                localStorage.clear();
+            });
+            it("getPrivateKeysListFromStorage() should be return null if array empty or remove", function () {
+                expect(sp8de.getPrivateKeysListFromStorage()).toBeNull();
+                localStorage.setItem(nameField, JSON.stringify([]));
+                expect(sp8de.getPrivateKeysListFromStorage()).toBeNull();
+                localStorage.setItem(nameField, JSON.stringify({name: 'name'}));
+                expect(sp8de.getPrivateKeysListFromStorage()).toBeNull();
+                localStorage.setItem(nameField, JSON.stringify({name: 'name', privateKeys: []}));
+                expect(sp8de.getPrivateKeysListFromStorage()).toBeNull();
+                localStorage.clear();
+            });
+
+        });
+        describe("Check", function () {
+            it("isKeysInStorage method to be defined", function () {
+                expect(sp8de.isKeysInStorage).toBeDefined();
+            });
+            it("isKeysInStorage should to be return true if there are", function () {
+                localStorage.setItem(nameField, JSON.stringify([1]));
+                expect(sp8de.isKeysInStorage(sp8de.getUserInStorage())).toBeTruthy();
+                localStorage.clear();
+            });
+            it("isKeysInStorage should to be return true if there are for user", function () {
+                localStorage.setItem('user', JSON.stringify({name: 'name', privateKeys: [1]}));
+                expect(sp8de.isKeysInStorage(sp8de.getUserInStorage())).toBeTruthy();
+                localStorage.clear();
+            });
+            it("isKeysInStorage should to be return false if not", function () {
+                localStorage.clear();
+                expect(sp8de.isKeysInStorage()).toBeFalsy();
+            });
+            it("isKeysInStorage should to be return true if there are for user", function () {
+                localStorage.setItem('user', JSON.stringify({name: 'name'}));
+                expect(sp8de.isKeysInStorage(sp8de.getUserInStorage())).toBeFalsy();
+                localStorage.clear();
+            });
+            it("isKeysInStorage should to be return false if array empty", function () {
+                localStorage.setItem(nameField, JSON.stringify([]));
+                expect(sp8de.isKeysInStorage(sp8de.getUserInStorage())).toBeFalsy();
+                localStorage.clear();
+            });
+            it("isKeysInStorage should to be return false if there are for user if array empty", function () {
+                localStorage.setItem('user', JSON.stringify({name: 'name', privateKeys: []}));
+                expect(sp8de.isKeysInStorage(sp8de.getUserInStorage())).toBeFalsy();
+                localStorage.clear();
+            });
+        });
+        describe("Get user in storage", function () {
+            it("getUserInStorage method to be defined", function () {
+                expect(sp8de.getUserInStorage).toBeDefined();
+            });
+            it("getUserInStorage should to be return user if there is", function () {
+                const user={name: 'name', privateKeys: [1,2,3]};
+                localStorage.setItem('user', JSON.stringify(user));
+                expect(sp8de.getUserInStorage()).toEqual(user);
+                localStorage.clear();
+            });
+            it("getUserInStorage should to be return null if user is not there", function () {
+                localStorage.clear();
+                expect(sp8de.getUserInStorage()).toBeNull();
+            });
+        });
+    })
+
 });
