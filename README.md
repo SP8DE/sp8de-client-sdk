@@ -37,7 +37,9 @@ const seed = sp8deClientSDK.generateSeed();
 ```
 
 ### Store wallets in localstorage
-Methods for storing wallet in the storage use the choice between `wallets` and `user` keys in localstorage (for situations where the user-object in the application)
+Methods for storing wallet in the storage use the choice between `wallets` and `user` keys in localstorage (for situations where the user-object in the application)*
+If in localstorage has a `user` key, then wallet will be added to him in key `wallets`.
+
 
 ## About
 
