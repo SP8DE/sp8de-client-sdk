@@ -2,13 +2,14 @@ let Buffer = require('buffer').Buffer;
 
 /**
  * @class Sp8deClientSDK
- * @constructor
  * */
 export class Sp8deClientSDK {
     constructor(eth = undefined, privateKeyGenerator = undefined) {
         this.EthJS = !eth ? window.EthJS.Util : eth;
         this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
     }
+
+    nameField = 'privateKeys';
 
     /**
      * @description Returns a new private key
@@ -36,7 +37,7 @@ export class Sp8deClientSDK {
     /**
      * @description Returns an array of random numbers from seed-array (use mt19937 algorithm)
      * @memberOf Sp8deClientSDK
-     * @param {object} parameters - {array: [], min: number, max: number, count: number}
+     * @param {{array: [], min: number, max: number, count: number}} parameters - {array: [], min: number, max: number, count: number}
      * @return {number[]} An array of length given by a "count" containing random numbers
      * */
     getRandomFromArray(parameters) {
@@ -70,7 +71,7 @@ export class Sp8deClientSDK {
     /**
      * @description Signs a message from privateKey, seed, nonce. Returns message signed with private key.
      * @memberOf Sp8deClientSDK
-     * @param {object} parameters - {privateKey: string, seed: number, nonce: number}
+     * @param {{privateKey: string, seed: number, nonce: number}} parameters - {privateKey: string, seed: number, nonce: number}
      * @return {string} Message signed with private key
      * */
     signMessage(parameters) {
@@ -91,7 +92,7 @@ export class Sp8deClientSDK {
     /**
      * @description Validates the message. Use sign, nonce, public key and seed. Returns true if the validation was successful.
      * @memberOf Sp8deClientSDK
-     * @param {object} parameters - {sign: string, pubKey: string, seed: number, nonce: number}
+     * @param {{sign: string, pubKey: string, seed: number, nonce: number}} parameters - {sign: string, pubKey: string, seed: number, nonce: number}
      * @return {boolean} True if successful, false if unsuccessful
      * */
     validateSign(parameters) {
@@ -122,6 +123,102 @@ export class Sp8deClientSDK {
         return true;
     };
 
+    /**
+     * @description Add to localstorage to key privateKeys in key "User" or root. If user without field "privateKeys" add it.
+     * @param value {string} Private key
+     */
+    addPrivateKeyToStorage(value) {
+        let user = this.getUserInStorage(), privateKeys = [];
+        if (user) {
+            if (!user[this.nameField]) {
+                user[this.nameField] = [];
+            }
+            user[this.nameField].push(value);
+            localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            if (localStorage.getItem(this.nameField)) {
+                privateKeys = JSON.parse(localStorage.getItem(this.nameField));
+            }
+            privateKeys.push(value);
+            localStorage.setItem(this.nameField, JSON.stringify(privateKeys));
+        }
+    }
+
+    /**
+     * @description Removing last private key from array in localstorage
+     */
+    removeLastPrivateKeyFromStorage() {
+        let user = this.getUserInStorage(), privateKeys = [];
+        if (!this.isKeysInStorage(user)) return;
+        if (user) {
+            user[this.nameField].pop();
+            localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            privateKeys = JSON.parse(localStorage.getItem(this.nameField));
+            privateKeys.pop();
+            localStorage.setItem(this.nameField, JSON.stringify(privateKeys));
+        }
+    }
+
+    /**
+     * @description Clear array of private keys (delete key from localstorage)
+     */
+    clearPrivateKeyStorage() {
+        let user = this.getUserInStorage();
+        if (user) {
+            delete user[this.nameField];
+            localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            localStorage.removeItem(this.nameField);
+        }
+    }
+
+    /**
+     * @description Returns active private key in localstorage
+     * @returns {string} Active private key or null if no array
+     */
+    getActivePrivateKeyFromStorage() {
+        let array = this.getPrivateKeysListFromStorage();
+        return array ? array.pop() : null;
+    }
+
+    /**
+     * @description Returns array of string contains all private keys from localstorage
+     * @return {string[]} Array of private keys or null if no array
+     */
+    getPrivateKeysListFromStorage() {
+        let user = this.getUserInStorage(), privateKeys = [];
+        if (!this.isKeysInStorage(user)) return null;
+        if (user) {
+            return user[this.nameField];
+        } else {
+            privateKeys = JSON.parse(localStorage.getItem(this.nameField));
+            return privateKeys;
+        }
+    }
+
+    /**
+     * @description  Check if there are keys in vault
+     * @return {boolean} True if there is, false is not
+     * @param {object} user - User in storage, if it there is
+     */
+    isKeysInStorage(user) {
+        let privateKeys = [];
+        if (user) {
+            if (!user[this.nameField] || !!!user[this.nameField].length) return false;
+        } else {
+            if (!!!localStorage.getItem(this.nameField)) return false;
+            privateKeys = JSON.parse(localStorage.getItem(this.nameField));
+            if (!!!privateKeys.length) return false;
+        }
+        return true;
+    }
+
+    getUserInStorage() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        return user ? user : null;
+    }
+
     getTrezorHash(msg) {
         return this.EthJS.sha3(
             Buffer.concat([
@@ -137,7 +234,7 @@ export class Sp8deClientSDK {
 *
 * Accessory functions for methods
 *
-* */
+*/
 class AccessoryFunctions {
     static getNakedAddress(address) {
         return address.toLowerCase().replace('0x', '');
