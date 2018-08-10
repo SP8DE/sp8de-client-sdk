@@ -26,11 +26,12 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>let Buffer = require('buffer').Buffer;
+            <pre class="prettyprint source linenums"><code>let Buffer = require('buffer').Buffer,
+    nameKeysField = 'Wallets',
+    namUserField = 'user';
 
 /**
  * @class Sp8deClientSDK
- * @constructor
  * */
 export class Sp8deClientSDK {
     constructor(eth = undefined, privateKeyGenerator = undefined) {
@@ -38,20 +39,53 @@ export class Sp8deClientSDK {
         this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
     }
 
+
     /**
-     * @description Returns new private key
+     * @description Returns a new private key
      * @memberOf Sp8deClientSDK
-     * @return {number} Array contains random numbers
+     * @return {number} A public key of 66 characters long
      * */
     generatePrivateKey() {
         return this.privateKeyGenerator.Wallet.createRandom().privateKey;
     };
 
+
     /**
-     * @description Returns public key for private key
+     * @description Returns a new wallet
+     * @memberOf Sp8deClientSDK
+     * @return {object} Object contains wallet
+     * */
+    generateWallet() {
+        return this.privateKeyGenerator.Wallet.createRandom();
+    };
+
+    /**
+     * @description Returns a new wallet
+     * @memberOf Sp8deClientSDK
+     * @param {object} wallet - object with wallet
+     * @param {string} password
+     * @return {promise} promise with json
+     * */
+    encryptWallet(wallet, password) {
+        return wallet.encrypt(password);
+    };
+
+    /**
+     * @description Returns a new wallet
+     * @memberOf Sp8deClientSDK
+     * @param {string}  wallet - Encrypted JSON with wallet
+     * @param {string} password
+     * @return {promise} promise with json
+     * */
+    decryptWallet(wallet, password) {
+        return this.privateKeyGenerator.Wallet.fromEncryptedWallet(wallet, password);
+    };
+
+    /**
+     * @description Returns the public key obtains from the private key
      * @memberOf Sp8deClientSDK
      * @param {string} privateKey - private key
-     * @return {string} Public key
+     * @return {string} A public key of 42 characters long
      * */
     getPubKey(privateKey) {
         if (!privateKey) {
@@ -64,8 +98,8 @@ export class Sp8deClientSDK {
     /**
      * @description Returns an array of random numbers from seed-array (use mt19937 algorithm)
      * @memberOf Sp8deClientSDK
-     * @param {object} parameters - {array: [], min: number, max: number, count: number}
-     * @return {number[]} Array contains random numbers
+     * @param {{array: array, min: number, max: number, count: number}} parameters - {array: [], min: number, max: number, count: number}
+     * @return {number[]} An array of length given by a "count" containing random numbers
      * */
     getRandomFromArray(parameters) {
         let rand = new mt19937(),
@@ -87,7 +121,7 @@ export class Sp8deClientSDK {
     /**
      * @description Returns a random number to use as a seed
      * @memberOf Sp8deClientSDK
-     * @return {number} Random seed
+     * @return {number} Random seed number. Length 9-10
      * */
     generateSeed() {
         let rnd = new Uint32Array(1);
@@ -96,13 +130,12 @@ export class Sp8deClientSDK {
     };
 
     /**
-     * @description Signs a message from privateKey, seed, nonce
+     * @description Signs a message from privateKey, seed, nonce. Returns message signed with private key.
      * @memberOf Sp8deClientSDK
-     * @param {object} parameters - {privateKey: string, seed: number, nonce: number}
-     * @return {object} Object {pubKey: string, message: string, sign: string, version: string, signer: string}
+     * @param {{privateKey: string, seed: number, nonce: number}} parameters - {privateKey: string, seed: number, nonce: number}
+     * @return {string} Message signed with private key
      * */
     signMessage(parameters) {
-        //
         if (parameters.privateKey === undefined ||
             parameters.seed === undefined ||
             parameters.nonce === undefined) {
@@ -114,19 +147,13 @@ export class Sp8deClientSDK {
             msg = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
             signed = this.EthJS.ecsign(msg, this.EthJS.toBuffer(parameters.privateKey)),
             tx = signed.r.toString('hex') + signed.s.toString('hex') + this.EthJS.stripHexPrefix(this.EthJS.intToHex(signed.v));
-        return {
-            pubKey: pubKey,
-            message: message,
-            sign: this.EthJS.addHexPrefix(tx),
-            version: '3',
-            signer: 'MEW'
-        };
+        return this.EthJS.addHexPrefix(tx);
     };
 
     /**
      * @description Validates the message. Use sign, nonce, public key and seed. Returns true if the validation was successful.
      * @memberOf Sp8deClientSDK
-     * @param {object} parameters - {sign: string, pubKey: string, seed: number, nonce: number}
+     * @param {{sign: string, pubKey: string, seed: number, nonce: number}} parameters - {sign: string, pubKey: string, seed: number, nonce: number}
      * @return {boolean} True if successful, false if unsuccessful
      * */
     validateSign(parameters) {
@@ -157,6 +184,98 @@ export class Sp8deClientSDK {
         return true;
     };
 
+    /**
+     * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
+     * @param value {string} Private key
+     */
+    addWalletToStorage(value) {
+        let storageKeys = this.getWalletsInStorage();
+        if (Array.isArray(storageKeys)) {
+            storageKeys.push(value);
+            localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
+        } else if (storageKeys) {
+            if (!storageKeys[nameKeysField]) {
+                storageKeys[nameKeysField] = [];
+            }
+            storageKeys[nameKeysField].push(value);
+            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+        } else {
+            localStorage.setItem(nameKeysField, JSON.stringify([value]));
+        }
+    }
+
+    /**
+     * @description Removing last private key from array in localstorage
+     */
+    removeLastWalletFromStorage() {
+        let storageKeys = this.getWalletsInStorage();
+        if (!this.isKeysInStorage(storageKeys)) return;
+        if (Array.isArray(storageKeys)) {
+            storageKeys.pop();
+            localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
+        } else {
+            storageKeys[nameKeysField].pop();
+            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+        }
+    }
+
+    /**
+     * @description Clear array of private keys (delete key from localstorage)
+     */
+    clearWalletStorage() {
+        let storageKeys = this.getWalletsInStorage();
+        if (Array.isArray(storageKeys)) {
+            localStorage.removeItem(nameKeysField);
+        } else {
+            delete storageKeys[nameKeysField];
+            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+        }
+    }
+
+    /**
+     * @description Returns active private key in localstorage
+     * @returns {string} Active private key or null if no array
+     */
+    getActiveWalletFromStorage() {
+        let array = this.getWalletsListFromStorage();
+        return array ? array.pop() : null;
+    }
+
+    /**
+     * @description Returns array of string contains all private keys from localstorage
+     * @return {string[]} Array of private keys or null if no array
+     */
+    getWalletsListFromStorage() {
+        let storageKeys = this.getWalletsInStorage();
+        if (!this.isKeysInStorage(storageKeys)) return null;
+        if (Array.isArray(storageKeys)) {
+            return storageKeys;
+        } else if (storageKeys) {
+            return storageKeys[nameKeysField];
+        } else return null;
+    }
+
+    /**
+     * @description  Check if there are keys in vault
+     * @return {boolean} True if there is, false is not
+     * @param {object} storageKeys - User in storage, if it there is
+     */
+    isKeysInStorage(storageKeys) {
+        if (!storageKeys) return false;
+        if (Array.isArray(storageKeys)) {
+            if (!!!storageKeys.length) return false;
+        } else {
+            if (!storageKeys[nameKeysField] || !!!storageKeys[nameKeysField].length) return false;
+        }
+        return true;
+    }
+
+    getWalletsInStorage() {
+        const userKeys = JSON.parse(localStorage.getItem(namUserField)),
+            Wallets = localStorage.getItem(nameKeysField) ? JSON.parse(localStorage.getItem(nameKeysField)) : null;
+        return userKeys ? userKeys : Wallets;
+    }
+
     getTrezorHash(msg) {
         return this.EthJS.sha3(
             Buffer.concat([
@@ -172,7 +291,7 @@ export class Sp8deClientSDK {
 *
 * Accessory functions for methods
 *
-* */
+*/
 class AccessoryFunctions {
     static getNakedAddress(address) {
         return address.toLowerCase().replace('0x', '');
@@ -340,7 +459,7 @@ class mt19937 {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Aug 09 2018 12:55:16 GMT+0300 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Aug 10 2018 16:18:46 GMT+0300 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>

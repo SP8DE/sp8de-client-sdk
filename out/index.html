@@ -55,17 +55,224 @@ const sp8deClientSDK = new Sp8deClientSDK();
 const seed = sp8deClientSDK.generateSeed();
 // returns seed</code></pre><h3>CDN</h3><pre class="prettyprint source lang-js"><code>const see d = sp8deClientSDK.generateSeed();
 // returns seed</code></pre><h2>About</h2><p>A simple set of ... , mainly for frontend apps.</p>
-<h2>Available Methods</h2><pre class="prettyprint source"><code>signMessage         &lt;Function ({privateKey: string, seed: number, nonce: number}) : ({})>
-getPubKey           &lt;Function (string) : (string)>
-getRandomFromArray  &lt;Function ({array: number[], min: number, max: number, count: number}) : (number)>
-generateSeed        &lt;Function () : (number)>
-generatePrivateKey  &lt;Function () : (string)>
-validateSign        &lt;Function ({sign: string, pubKey: string, seed: number, nonce: number}) : (boolean)></code></pre><h2>Guides</h2><p>You'll find more detailed information on using <code>sp8de-client-sdk</code> and tailoring it to your needs in our guides:</p>
+<h2>Guides</h2><p>You'll find more detailed information on using <code>sp8de-client-sdk</code> and tailoring it to your needs in our guides:</p>
 <p>...:</p>
 <h2>NPM commands</h2><p><code>doc</code>: Run generate documentation from jsdoc</p>
 <p><code>test</code>: Run karma test</p>
 <p><code>watch</code>: Run watchify to autorun browserify for create single file</p>
-<p><code>toCDN</code>: Create single file with browserify and minification</p></article>
+<p><code>toCDN</code>: Create single file with browserify and minification</p>
+<h2>API</h2><ul>
+<li><a href="#Sp8deClientSDK">Sp8deClientSDK</a><ul>
+<li><a href="#Sp8deClientSDK+generatePrivateKey">.generatePrivateKey()</a> ⇒ <code>number</code></li>
+<li><a href="#Sp8deClientSDK+generateWallet">.generateWallet()</a> ⇒ <code>object</code></li>
+<li><a href="#Sp8deClientSDK+encryptWallet">.encryptWallet(wallet, password)</a> ⇒ <code>promise</code></li>
+<li><a href="#Sp8deClientSDK+decryptWallet">.decryptWallet(wallet, password)</a> ⇒ <code>promise</code></li>
+<li><a href="#Sp8deClientSDK+getPubKey">.getPubKey(privateKey)</a> ⇒ <code>string</code></li>
+<li><a href="#Sp8deClientSDK+getRandomFromArray">.getRandomFromArray(parameters)</a> ⇒ <code>Array.&lt;number&gt;</code></li>
+<li><a href="#Sp8deClientSDK+generateSeed">.generateSeed()</a> ⇒ <code>number</code></li>
+<li><a href="#Sp8deClientSDK+signMessage">.signMessage(parameters)</a> ⇒ <code>string</code></li>
+<li><a href="#Sp8deClientSDK+validateSign">.validateSign(parameters)</a> ⇒ <code>boolean</code></li>
+<li><a href="#Sp8deClientSDK+addWalletToStorage">.addWalletToStorage(value)</a></li>
+<li><a href="#Sp8deClientSDK+removeLastWalletFromStorage">.removeLastWalletFromStorage()</a></li>
+<li><a href="#Sp8deClientSDK+clearWalletStorage">.clearWalletStorage()</a></li>
+<li><a href="#Sp8deClientSDK+getActiveWalletFromStorage">.getActiveWalletFromStorage()</a> ⇒ <code>string</code></li>
+<li><a href="#Sp8deClientSDK+getWalletsListFromStorage">.getWalletsListFromStorage()</a> ⇒ <code>Array.&lt;string&gt;</code></li>
+<li><a href="#Sp8deClientSDK+isKeysInStorage">.isKeysInStorage(storageKeys)</a> ⇒ <code>boolean</code></li>
+</ul>
+</li>
+</ul>
+<h3>sp8deClientSDK.generatePrivateKey() ⇒ <code>number</code></h3><p>Returns a new private key</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>number</code> - A public key of 66 characters long
+<a name="Sp8deClientSDK+generateWallet"></a></p>
+<h3>sp8deClientSDK.generateWallet() ⇒ <code>object</code></h3><p>Returns a new wallet</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>object</code> - Object contains wallet
+<a name="Sp8deClientSDK+encryptWallet"></a></p>
+<h3>sp8deClientSDK.encryptWallet(wallet, password) ⇒ <code>promise</code></h3><p>Returns a new wallet</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>promise</code> - promise with json</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wallet</td>
+<td><code>object</code></td>
+<td>object with wallet</td>
+</tr>
+<tr>
+<td>password</td>
+<td><code>string</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Sp8deClientSDK+decryptWallet"></a></p>
+<h3>sp8deClientSDK.decryptWallet(wallet, password) ⇒ <code>promise</code></h3><p>Returns a new wallet</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>promise</code> - promise with json</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wallet</td>
+<td><code>string</code></td>
+<td>Encrypted JSON with wallet</td>
+</tr>
+<tr>
+<td>password</td>
+<td><code>string</code></td>
+</tr>
+</tbody>
+</table>
+<p><a name="Sp8deClientSDK+getPubKey"></a></p>
+<h3>sp8deClientSDK.getPubKey(privateKey) ⇒ <code>string</code></h3><p>Returns the public key obtains from the private key</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>string</code> - A public key of 42 characters long</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>privateKey</td>
+<td><code>string</code></td>
+<td>private key</td>
+</tr>
+</tbody>
+</table>
+<p><a name="Sp8deClientSDK+getRandomFromArray"></a></p>
+<h3>sp8deClientSDK.getRandomFromArray(parameters) ⇒ <code>Array.&lt;number&gt;</code></h3><p>Returns an array of random numbers from seed-array (use mt19937 algorithm)</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>Array.&lt;number&gt;</code> - An array of length given by a &quot;count&quot; containing random numbers</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>parameters</td>
+<td><code>Object</code></td>
+<td>{array: [], min: number, max: number, count: number}</td>
+</tr>
+</tbody>
+</table>
+<p><a name="Sp8deClientSDK+generateSeed"></a></p>
+<h3>sp8deClientSDK.generateSeed() ⇒ <code>number</code></h3><p>Returns a random number to use as a seed</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>number</code> - Random seed number. Length 9-10
+<a name="Sp8deClientSDK+signMessage"></a></p>
+<h3>sp8deClientSDK.signMessage(parameters) ⇒ <code>string</code></h3><p>Signs a message from privateKey, seed, nonce. Returns message signed with private key.</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>string</code> - Message signed with private key</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>parameters</td>
+<td><code>Object</code></td>
+<td>{privateKey: string, seed: number, nonce: number}</td>
+</tr>
+</tbody>
+</table>
+<p><a name="Sp8deClientSDK+validateSign"></a></p>
+<h3>sp8deClientSDK.validateSign(parameters) ⇒ <code>boolean</code></h3><p>Validates the message. Use sign, nonce, public key and seed. Returns true if the validation was successful.</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>boolean</code> - True if successful, false if unsuccessful</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>parameters</td>
+<td><code>Object</code></td>
+<td>{sign: string, pubKey: string, seed: number, nonce: number}</td>
+</tr>
+</tbody>
+</table>
+<p><a name="Sp8deClientSDK+addWalletToStorage"></a></p>
+<h3>sp8deClientSDK.addWalletToStorage(value)</h3><p>Add to localstorage to key Wallets in key &quot;User&quot; or root. If user without field &quot;Wallets&quot; add it.</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a></p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>value</td>
+<td><code>string</code></td>
+<td>Private key</td>
+</tr>
+</tbody>
+</table>
+<p><a name="Sp8deClientSDK+removeLastWalletFromStorage"></a></p>
+<h3>sp8deClientSDK.removeLastWalletFromStorage()</h3><p>Removing last private key from array in localstorage</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<a name="Sp8deClientSDK+clearWalletStorage"></a></p>
+<h3>sp8deClientSDK.clearWalletStorage()</h3><p>Clear array of private keys (delete key from localstorage)</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<a name="Sp8deClientSDK+getActiveWalletFromStorage"></a></p>
+<h3>sp8deClientSDK.getActiveWalletFromStorage() ⇒ <code>string</code></h3><p>Returns active private key in localstorage</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>string</code> - Active private key or null if no array
+<a name="Sp8deClientSDK+getWalletsListFromStorage"></a></p>
+<h3>sp8deClientSDK.getWalletsListFromStorage() ⇒ <code>Array.&lt;string&gt;</code></h3><p>Returns array of string contains all private keys from localstorage</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>Array.&lt;string&gt;</code> - Array of private keys or null if no array
+<a name="Sp8deClientSDK+isKeysInStorage"></a></p>
+<h3>sp8deClientSDK.isKeysInStorage(storageKeys) ⇒ <code>boolean</code></h3><p>Check if there are keys in vault</p>
+<p><strong>Kind</strong>: instance method of <a href="#Sp8deClientSDK"><code>Sp8deClientSDK</code></a>
+<strong>Returns</strong>: <code>boolean</code> - True if there is, false is not</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>storageKeys</td>
+<td><code>object</code></td>
+<td>User in storage, if it there is</td>
+</tr>
+</tbody>
+</table></article>
     </section>
 
 
@@ -82,7 +289,7 @@ validateSign        &lt;Function ({sign: string, pubKey: string, seed: number, n
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Aug 09 2018 12:55:16 GMT+0300 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Aug 10 2018 16:18:46 GMT+0300 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>
