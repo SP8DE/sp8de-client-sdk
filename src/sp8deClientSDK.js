@@ -59,8 +59,7 @@ export class Sp8deClientSDK {
      * */
     getPubKey(privateKey) {
         if (!privateKey) {
-            console.error('Invalid parameter');
-            return;
+            throw error('Invalid parameter');
         }
         return this.EthJS.addHexPrefix(this.EthJS.privateToAddress(privateKey).toString('hex'))
     };
@@ -78,8 +77,7 @@ export class Sp8deClientSDK {
             !Array.isArray(parameters.array) ||
             parameters.min === undefined ||
             parameters.max === undefined) {
-            console.error('Invalid parameters');
-            return;
+            throw error('Invalid parameters');
         }
         rand.init_by_array(parameters.array, parameters.array.length);
         for (let i = 0; i < parameters.count; i++) {
@@ -109,8 +107,7 @@ export class Sp8deClientSDK {
         if (parameters.privateKey === undefined ||
             parameters.seed === undefined ||
             parameters.nonce === undefined) {
-            console.error('Invalid parameters', parameters);
-            return null;
+            throw error('Invalid parameters', parameters);
         }
         let pubKey = this.getPubKey(parameters.privateKey),
             message = `${pubKey};${parameters.seed};${parameters.nonce}`,
@@ -157,18 +154,19 @@ export class Sp8deClientSDK {
     /**
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
+     * @param storageWallets {object | array} Object wallet contained in storage
      */
-    addWalletToStorage(value) {
-        let storageKeys = this.getWalletsInStorage();
-        if (Array.isArray(storageKeys)) {
-            storageKeys.push(value);
-            localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
-        } else if (storageKeys) {
-            if (!storageKeys[nameKeysField]) {
-                storageKeys[nameKeysField] = [];
+    addWalletToStorage(value, storageWallets = this.getWalletsInStorage()) {
+        if (!value) throw error('invalid value');
+        if (Array.isArray(storageWallets)) {
+            storageWallets.push(value);
+            localStorage.setItem(nameKeysField, JSON.stringify(storageWallets));
+        } else if (storageWallets) {
+            if (!storageWallets[nameKeysField]) {
+                storageWallets[nameKeysField] = [];
             }
-            storageKeys[nameKeysField].push(value);
-            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+            storageWallets[nameKeysField].push(value);
+            localStorage.setItem(namUserField, JSON.stringify(storageWallets));
         } else {
             localStorage.setItem(nameKeysField, JSON.stringify([value]));
         }
@@ -176,66 +174,66 @@ export class Sp8deClientSDK {
 
     /**
      * @description Removing last private key from array in localstorage
+     * @param storageWallets {object | array} Object wallet contained in storage
      */
-    removeLastWalletFromStorage() {
-        let storageKeys = this.getWalletsInStorage();
-        if (!this.isKeysInStorage(storageKeys)) return;
-        if (Array.isArray(storageKeys)) {
-            storageKeys.pop();
-            localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
+    removeLastWalletFromStorage(storageWallets = this.getWalletsInStorage()) {
+        if (!this.isKeysInStorage(storageWallets)) return;
+        if (Array.isArray(storageWallets)) {
+            storageWallets.pop();
+            localStorage.setItem(nameKeysField, JSON.stringify(storageWallets));
         } else {
-            storageKeys[nameKeysField].pop();
-            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+            storageWallets[nameKeysField].pop();
+            localStorage.setItem(namUserField, JSON.stringify(storageWallets));
         }
     }
 
     /**
-     * @description Clear array of private keys (delete key from localstorage)
+     * @description Clear array of private keys (delete key from localstorage
+     * @param storageWallets {object | array} Object wallet contained in storage)
      */
-    clearWalletStorage() {
-        let storageKeys = this.getWalletsInStorage();
-        if (Array.isArray(storageKeys)) {
+    clearWalletStorage(storageWallets = this.getWalletsInStorage()) {
+        if (Array.isArray(storageWallets)) {
             localStorage.removeItem(nameKeysField);
         } else {
-            delete storageKeys[nameKeysField];
-            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+            delete storageWallets[nameKeysField];
+            localStorage.setItem(namUserField, JSON.stringify(storageWallets));
         }
     }
 
     /**
      * @description Returns active private key in localstorage
      * @returns {string} Active private key or null if no array
+     * @param array {array} Array wallets contained in storage
      */
-    getActiveWalletFromStorage() {
-        let array = this.getWalletsListFromStorage();
+    getActiveWalletFromStorage(array = this.getWalletsListFromStorage()) {
         return array ? array.pop() : null;
     }
 
     /**
      * @description Returns array of string contains all private keys from localstorage
+     * @param storageWallets {object | array} Object wallet contained in storage
      * @return {string[]} Array of private keys or null if no array
      */
-    getWalletsListFromStorage() {
-        let storageKeys = this.getWalletsInStorage();
-        if (!this.isKeysInStorage(storageKeys)) return null;
-        if (Array.isArray(storageKeys)) {
-            return storageKeys;
-        } else if (storageKeys) {
-            return storageKeys[nameKeysField];
+    getWalletsListFromStorage(storageWallets = this.getWalletsInStorage()) {
+        if (!this.isKeysInStorage(storageWallets)) return null;
+        if (Array.isArray(storageWallets)) {
+            return storageWallets;
+        } else if (storageWallets) {
+            return storageWallets[nameKeysField];
         } else return null;
     }
 
     /**
      * @description  Check if there are keys in vault
      * @return {boolean} True if there is, false is not
-     * @param {object} storageKeys - User in storage, if it there is
+     * @param {object} storageWallets - User in storage, if it there is
      */
-    isKeysInStorage(storageKeys) {
-        if (!storageKeys) return false;
-        if (Array.isArray(storageKeys)) {
-            if (!!!storageKeys.length) return false;
+    isKeysInStorage(storageWallets) {
+        if (!storageWallets) return false;
+        if (Array.isArray(storageWallets)) {
+            if (!!!storageWallets.length) return false;
         } else {
-            if (!storageKeys[nameKeysField] || !!!storageKeys[nameKeysField].length) return false;
+            if (!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length) return false;
         }
         return true;
     }
