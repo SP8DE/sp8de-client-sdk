@@ -228,7 +228,7 @@ export class Sp8deClientSDK {
      * @return {boolean} True if there is, false is not
      * @param {object} storageWallets - User in storage, if it there is
      */
-    isKeysInStorage(storageWallets) {
+    isKeysInStorage(storageWallets = this.getWalletsInStorage()) {
         if (!storageWallets) return false;
         if (Array.isArray(storageWallets)) {
             if (!!!storageWallets.length) return false;
