@@ -13,12 +13,23 @@ For angular2 + applications, you need to add references to cryptographic librari
 <script src="https://www.mobilefish.com/scripts/ethereumjs/ethereumjs-util.js"></script>
 <script src="https://cdn.ethers.io/scripts/ethers-v3.min.js"></script>
 ```
+
 ### CDN
 ```
 <script src="https:/*.js"></script>
 ```
-## Usage
 
+## NPM commands
+
+`doc`: Run generate documentation from jsdoc
+
+`test`: Run karma test
+
+`watch`: Run watchify to autorun browserify for create single file
+
+`toCDN`: Create single file with browserify and minification
+
+## Usage
 ### NPM
 ```js
 import {Sp8deClientSDK} from 'sp8de-client-sdk';
@@ -54,7 +65,7 @@ A simple set of ... , mainly for frontend apps.
     // Generate wallet contains private key.
     const wallet = this.sp8deClientSDK.generateWallet();
     this.privateKey = wallet.privateKey;
-    // Generate public key from priovate key
+    // Generate public key from private key
     this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
     // Encrypt wallet before save to storage for ...
     from(this.sp8deClientSDK.encryptWallet(this.sp8deClientSDK.generateWallet(), password))
@@ -99,15 +110,6 @@ Validating random number from array-seed
     return clientNumber[0] === serverNumber[0];
   }
 ```
-## NPM commands
-
-`doc`: Run generate documentation from jsdoc
-
-`test`: Run karma test
-
-`watch`: Run watchify to autorun browserify for create single file
-
-`toCDN`: Create single file with browserify and minification
 
 ## API
 * [Sp8deClientSDK](#Sp8deClientSDK)
