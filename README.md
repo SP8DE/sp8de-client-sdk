@@ -48,7 +48,7 @@ const seed = sp8deClientSDK.generateSeed();
 ```
 
 ### Store wallets in localstorage
-Methods for storing wallet in the storage use the choice between `wallets` and `user` keys in localstorage (for situations where the user-object in the application)*
+Methods for storing wallet in the storage use the choice between `wallets` and `user` keys in localstorage (for situations where the user-object in the application).
 If in localstorage has a `user` key, then wallet will be added to him in key `wallets`.
 
 
@@ -61,13 +61,45 @@ A simple set of ... , mainly for frontend apps.
 ### Wallet procedures
 #### Save on init
 ```js
+public init() {
+    // Check wallets in storage
+    if (this.sp8deClientSDK.isWalletsInStorage()) {
+      // Get wallet and decript him
+      from(this.sp8deClientSDK.decryptWallet(this.sp8deClientSDK.getActiveWalletFromStorage(), this.password))
+        .pipe(
+          map(item => <any>item)
+        )
+        .subscribe(wallet => {
+          // Save private key
+          this.privateKey = wallet.privateKey;
+          // Generate public key
+          this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
+        });
+    } else {
+      // Generate wallet containing private key.
+      let wallet;
+      this.privateKey = wallet.privateKey;
+          // Generate public key from private key
+          this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
+          // Encrypting the wallet before uploading it to the storage for data security.
+          from(this.sp8deClientSDK.encryptWallet(this.sp8deClientSDK.generateWallet(), password))
+            .pipe(
+              map(item => <any>item)
+            )
+            .subscribe(res => {
+              // Save encrypted wallet to localstorage
+              this.sp8deClientSDK.addWalletToStorage(res);
+            });
+    }
+  }
+
   public init() {
-    // Generate wallet contains private key.
+    // Generate wallet containing private key.
     const wallet = this.sp8deClientSDK.generateWallet();
     this.privateKey = wallet.privateKey;
     // Generate public key from private key
     this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
-    // Encrypt wallet before save to storage for ...
+    // Encrypting the wallet before uploading it to the storage for data security.
     from(this.sp8deClientSDK.encryptWallet(this.sp8deClientSDK.generateWallet(), password))
       .pipe(
         map(item => <any>item)
@@ -122,12 +154,14 @@ Validating random number from array-seed
     * [.generateSeed()](#Sp8deClientSDK+generateSeed) ⇒ <code>number</code>
     * [.signMessage(parameters)](#Sp8deClientSDK+signMessage) ⇒ <code>string</code>
     * [.validateSign(parameters)](#Sp8deClientSDK+validateSign) ⇒ <code>boolean</code>
-    * [.addWalletToStorage(value)](#Sp8deClientSDK+addWalletToStorage)
-    * [.removeLastWalletFromStorage()](#Sp8deClientSDK+removeLastWalletFromStorage)
-    * [.clearWalletStorage()](#Sp8deClientSDK+clearWalletStorage)
-    * [.getActiveWalletFromStorage()](#Sp8deClientSDK+getActiveWalletFromStorage) ⇒ <code>string</code>
-    * [.getWalletsListFromStorage()](#Sp8deClientSDK+getWalletsListFromStorage) ⇒ <code>Array.&lt;string&gt;</code>
-    * [.isKeysInStorage(storageKeys)](#Sp8deClientSDK+isKeysInStorage) ⇒ <code>boolean</code>
+    * [.addWalletToStorage(value, storageWallets)](#Sp8deClientSDK+addWalletToStorage)
+    * [.removeLastWalletFromStorage(storageWallets)](#Sp8deClientSDK+removeLastWalletFromStorage)
+    * [.clearWalletStorage(storageWallets)](#Sp8deClientSDK+clearWalletStorage)
+    * [.getActiveWalletFromStorage(array)](#Sp8deClientSDK+getActiveWalletFromStorage) ⇒ <code>string</code>
+    * [.getWalletsListFromStorage(storageWallets)](#Sp8deClientSDK+getWalletsListFromStorage) ⇒ <code>Array.&lt;string&gt;</code>
+    * [.isWalletsInStorage(storageWallets)](#Sp8deClientSDK+isWalletsInStorage) ⇒ <code>boolean</code>
+
+<a name="Sp8deClientSDK+generatePrivateKey"></a>
 
 ### sp8deClientSDK.generatePrivateKey() ⇒ <code>number</code>
 Returns a new private key
@@ -224,7 +258,7 @@ Validates the message. Use sign, nonce, public key and seed. Returns true if the
 
 <a name="Sp8deClientSDK+addWalletToStorage"></a>
 
-### sp8deClientSDK.addWalletToStorage(value)
+### sp8deClientSDK.addWalletToStorage(value, storageWallets)
 Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
 
 
@@ -232,36 +266,57 @@ Add to localstorage to key Wallets in key "User" or root. If user without field 
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>string</code> | Private key |
+| storageWallets | <code>object</code> \| <code>array</code> | Object wallet contained in storage |
 
 <a name="Sp8deClientSDK+removeLastWalletFromStorage"></a>
 
-### sp8deClientSDK.removeLastWalletFromStorage()
+### sp8deClientSDK.removeLastWalletFromStorage(storageWallets)
 Removing last private key from array in localstorage
 
 
+
+| Param | Type | Description |
+| --- | --- | --- |
+| storageWallets | <code>object</code> \| <code>array</code> | Object wallet contained in storage |
+
 <a name="Sp8deClientSDK+clearWalletStorage"></a>
 
-### sp8deClientSDK.clearWalletStorage()
-Clear array of private keys (delete key from localstorage)
+### sp8deClientSDK.clearWalletStorage(storageWallets)
+Clear array of private keys (delete key from localstorage
 
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| storageWallets | <code>object</code> \| <code>array</code> | Object wallet contained in storage) |
 
 <a name="Sp8deClientSDK+getActiveWalletFromStorage"></a>
 
-### sp8deClientSDK.getActiveWalletFromStorage() ⇒ <code>string</code>
+### sp8deClientSDK.getActiveWalletFromStorage(array) ⇒ <code>string</code>
 Returns active private key in localstorage
 
 
 **Returns**: <code>string</code> - Active private key or null if no array
+
+| Param | Type | Description |
+| --- | --- | --- |
+| array | <code>array</code> | Array wallets contained in storage |
+
 <a name="Sp8deClientSDK+getWalletsListFromStorage"></a>
 
-### sp8deClientSDK.getWalletsListFromStorage() ⇒ <code>Array.&lt;string&gt;</code>
+### sp8deClientSDK.getWalletsListFromStorage(storageWallets) ⇒ <code>Array.&lt;string&gt;</code>
 Returns array of string contains all private keys from localstorage
 
 
 **Returns**: <code>Array.&lt;string&gt;</code> - Array of private keys or null if no array
-<a name="Sp8deClientSDK+isKeysInStorage"></a>
 
-### sp8deClientSDK.isKeysInStorage(storageKeys) ⇒ <code>boolean</code>
+| Param | Type | Description |
+| --- | --- | --- |
+| storageWallets | <code>object</code> \| <code>array</code> | Object wallet contained in storage |
+
+<a name="Sp8deClientSDK+isWalletsInStorage"></a>
+
+### sp8deClientSDK.isWalletsInStorage(storageWallets) ⇒ <code>boolean</code>
 Check if there are keys in vault
 
 
@@ -269,5 +324,4 @@ Check if there are keys in vault
 
 | Param | Type | Description |
 | --- | --- | --- |
-| storageKeys | <code>object</code> | User in storage, if it there is |
-
+| storageWallets | <code>object</code> | User in storage, if it there is |
