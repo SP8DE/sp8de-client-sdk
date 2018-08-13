@@ -269,36 +269,36 @@ describe('Test library', function () {
 
         });
         describe("Check", function () {
-            it("isKeysInStorage method to be defined", function () {
-                expect(sp8de.isKeysInStorage).toBeDefined();
+            it("isWalletsInStorage method to be defined", function () {
+                expect(sp8de.isWalletsInStorage).toBeDefined();
             });
-            it("isKeysInStorage should to be return true if there are", function () {
+            it("isWalletsInStorage should to be return true if there are", function () {
                 localStorage.setItem(nameField, JSON.stringify([1]));
-                expect(sp8de.isKeysInStorage(sp8de.getWalletsInStorage())).toBeTruthy();
+                expect(sp8de.isWalletsInStorage(sp8de.getWalletsInStorage())).toBeTruthy();
                 localStorage.clear();
             });
-            it("isKeysInStorage should to be return true if there are for user", function () {
+            it("isWalletsInStorage should to be return true if there are for user", function () {
                 localStorage.setItem('user', JSON.stringify({name: 'name', Wallets: [1]}));
-                expect(sp8de.isKeysInStorage(sp8de.getWalletsInStorage())).toBeTruthy();
+                expect(sp8de.isWalletsInStorage(sp8de.getWalletsInStorage())).toBeTruthy();
                 localStorage.clear();
             });
-            it("isKeysInStorage should to be return false if not", function () {
+            it("isWalletsInStorage should to be return false if not", function () {
                 localStorage.clear();
-                expect(sp8de.isKeysInStorage()).toBeFalsy();
+                expect(sp8de.isWalletsInStorage()).toBeFalsy();
             });
-            it("isKeysInStorage should to be return true if there are for user", function () {
+            it("isWalletsInStorage should to be return true if there are for user", function () {
                 localStorage.setItem('user', JSON.stringify({name: 'name'}));
-                expect(sp8de.isKeysInStorage(sp8de.getWalletsInStorage())).toBeFalsy();
+                expect(sp8de.isWalletsInStorage(sp8de.getWalletsInStorage())).toBeFalsy();
                 localStorage.clear();
             });
-            it("isKeysInStorage should to be return false if array empty", function () {
+            it("isWalletsInStorage should to be return false if array empty", function () {
                 localStorage.setItem(nameField, JSON.stringify([]));
-                expect(sp8de.isKeysInStorage(sp8de.getWalletsInStorage())).toBeFalsy();
+                expect(sp8de.isWalletsInStorage(sp8de.getWalletsInStorage())).toBeFalsy();
                 localStorage.clear();
             });
-            it("isKeysInStorage should to be return false if there are for user if array empty", function () {
+            it("isWalletsInStorage should to be return false if there are for user if array empty", function () {
                 localStorage.setItem('user', JSON.stringify({name: 'name', Wallets: []}));
-                expect(sp8de.isKeysInStorage(sp8de.getWalletsInStorage())).toBeFalsy();
+                expect(sp8de.isWalletsInStorage(sp8de.getWalletsInStorage())).toBeFalsy();
                 localStorage.clear();
             });
         });

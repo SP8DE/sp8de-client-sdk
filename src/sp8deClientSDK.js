@@ -177,7 +177,7 @@ export class Sp8deClientSDK {
      * @param storageWallets {object | array} Object wallet contained in storage
      */
     removeLastWalletFromStorage(storageWallets = this.getWalletsInStorage()) {
-        if (!this.isKeysInStorage(storageWallets)) return;
+        if (!this.isWalletsInStorage(storageWallets)) return;
         if (Array.isArray(storageWallets)) {
             storageWallets.pop();
             localStorage.setItem(nameKeysField, JSON.stringify(storageWallets));
@@ -215,7 +215,7 @@ export class Sp8deClientSDK {
      * @return {string[]} Array of private keys or null if no array
      */
     getWalletsListFromStorage(storageWallets = this.getWalletsInStorage()) {
-        if (!this.isKeysInStorage(storageWallets)) return null;
+        if (!this.isWalletsInStorage(storageWallets)) return null;
         if (Array.isArray(storageWallets)) {
             return storageWallets;
         } else if (storageWallets) {
@@ -228,7 +228,7 @@ export class Sp8deClientSDK {
      * @return {boolean} True if there is, false is not
      * @param {object} storageWallets - User in storage, if it there is
      */
-    isKeysInStorage(storageWallets = this.getWalletsInStorage()) {
+    isWalletsInStorage(storageWallets = this.getWalletsInStorage()) {
         if (!storageWallets) return false;
         if (Array.isArray(storageWallets)) {
             if (!!!storageWallets.length) return false;
