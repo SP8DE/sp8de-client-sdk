@@ -45,12 +45,60 @@ If in localstorage has a `user` key, then wallet will be added to him in key `wa
 
 A simple set of ... , mainly for frontend apps.
 
-## Guides
+##  Examples
 
-You'll find more detailed information on using `sp8de-client-sdk` and tailoring it to your needs in our guides:
-
-...:
-
+### Wallet procedures
+#### Save on init
+```js
+  public init() {
+    // Generate wallet contains private key.
+    const wallet = this.sp8deClientSDK.generateWallet();
+    this.privateKey = wallet.privateKey;
+    // Generate public key from priovate key
+    this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
+    // Encrypt wallet before save to storage for ...
+    from(this.sp8deClientSDK.encryptWallet(this.sp8deClientSDK.generateWallet(), password))
+      .pipe(
+        map(item => <any>item)
+      )
+      .subscribe(res => {
+        // Save encrypted wallet to localstorage
+        this.sp8deClientSDK.addWalletToStorage(res);
+      });
+  }
+```
+#### Open for use
+```js
+    // Getting wallet from storage
+    let storageWallet = this.sp8deClientSDK.getActiveWalletFromStorage();
+    // Decrypt wallet for edxecute private key
+    this.sp8deClientSDK.decryptWallet(storageWallet, password).then(decryptRes => {
+        // Getting private key
+        this.privateKey = decryptRes.privateKey
+    })
+```
+### Signing
+```js
+    // set current date in milliseconds as nonce
+    const nonce = +(new Date());
+    // generate seed
+    const seed = this.sp8deClientSDK.generateSeed();
+    // signing message
+    const sign = this.sp8deClientSDK.signMessage({privateKey: this.privateKey, seed: seed, nonce: nonce});
+```
+### Validate
+Validating random number from array-seed
+```js
+  public validateWin(array: number[], serverNumber: number[]): boolean {
+    // generate random number from array
+    const clientNumber = this.getRandomFromArray({array: array, min: 1, max: 6, length: winNumber.length});
+    if (!clientNumber) {
+      console.error('Server value invalid!');
+      return;
+    }
+    return clientNumber[0] === serverNumber[0];
+  }
+```
 ## NPM commands
 
 `doc`: Run generate documentation from jsdoc
