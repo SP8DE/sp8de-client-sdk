@@ -1,20 +1,16 @@
 # Get started
 # Intro
-Next, we show how you can create a minimal-functional game "bones" on Angular2,
-in which the library `sp8de-client-sdk` will be used to ensure the reliability of
-gaming operations.
-## Installing
-For use `sp8de-client-sdk` functions it is necessary install him from NPM:
+Далее будет показано, как с помощью фреймворка ангуляр2 можно создать
+минимально-функциональную игру "кости", в которой будет использоваться библиотека
+`sp8de-client-sdk` для обеспечения надежности проводимых игровых операций.
+## Adding
+Для использования функций библиотеки `sp8de-client-sdk`
+необходимо поставить её из NPM:
 ```
 npm install sp8de-client-sdk
 ```
-And for Angular2 + applications, you need to add references to cryptographic libraries to the index.html file:
-```
-<script src="https://www.mobilefish.com/scripts/ethereumjs/ethereumjs-util.js"></script>
-<script src="https://cdn.ethers.io/scripts/ethers-v3.min.js"></script>
-```
-In `module.ts` need to import module `sp8de-client-sdk`
- and add to the array `providers`:
+Далее в `module.ts` необходимо импортировать модуль `sp8de-client-sdk`
+ и добавить в массив `providers`:
 
 ```js
 import {Sp8deClientSDK} from 'sp8de-client-sdk';
@@ -28,12 +24,12 @@ import {Sp8deClientSDK} from 'sp8de-client-sdk';
 
 ## Create services
 ### Crypto service
-Create a service containing a cryptographic functions.
+Создадим сервис содержащий крипто-функции.
 ```
 ng g s crypto
 ```
-In the service import `sp8de-client-sdk`
-and declare it in the constructor.
+В сервисе импортируем `sp8de-client-sdk`
+и объявим его в конструткторе
 ```js
 
 import {Sp8deClientSDK} from 'sp8de-client-sdk';
@@ -41,9 +37,10 @@ import {Sp8deClientSDK} from 'sp8de-client-sdk';
 constructor(public sp8deClientSDK: Sp8deClientSDK) {
   }
 ```
-Implements methods of the game.
+Далее реализуем методы для работы игры.
 #### Init
-Method creates a private key, if it is not in storage and generates a public key for further work:
+Метод создает приватный ключ, если его нет в хранилище и генерирует публичный
+для дальшейшей работы:
 ```js
 public init() {
     // Check wallets in storage
@@ -78,7 +75,7 @@ public init() {
   }
 ```
 #### Generate crypto-parameters
-Return values, required for the request to start game:
+Метод отдает значения, необходимые для запроса на старт игры:
 ```js
 public generateCryptoParameters(): any {
     //  Create object
@@ -101,15 +98,16 @@ public generateCryptoParameters(): any {
   }
 ```
 #### Getting random from array
-Check the random value returned from server at the end of game.
-Accept servers array and parameters of game:
+Следующий метод необходим для проверки случайного значения, возвращаемого сервером
+в конце игры. В него нужно передать присланный сервером массив и параметры игры:
 ```js
 public getRandomFromArray(parameters: { array: any[]; min: number, max: number, length: number }): number[] {
     return this.sp8deClientSDK.getRandomFromArray(parameters);
 }
 ```
 #### Validate win
-Uses the previous method to validate server values. Accepted server array and random number.
+Использует предыдущий метод для валидирования принятых значений
+(на вход принимает массив и число переданные сервером).
 ```js
 public validateWin(array: number[], serverNumber: number[]): boolean {
     const clientNumber = this.getRandomFromArray({array: array, min: 1, max: 6, length: serverNumber.length});
@@ -121,7 +119,7 @@ public validateWin(array: number[], serverNumber: number[]): boolean {
   }
 ```
 #### Validate players
-Validate correctness of the information transmitted by the server about other players.
+Проверяет правильность информации о других игроках переданную сервером
 ```js
 public validatePlayers(response: GameFinishResponse): boolean[] {
     const result: boolean[] = [];
@@ -138,15 +136,14 @@ public validatePlayers(response: GameFinishResponse): boolean[] {
   }
 ```
 ### Game service
-We will create a service containing functions that work with the api
-and control the beginning and end of the game.
+Создадим сервис содержащий функции работающие с апи и управляющие началом и концом игры.
 ```
 ng g s game
 ```
-Implements methods for work the game.
+Далее реализуем методы для работы игры.
 
 #### Start game
-Through api sends a request with parameters of start the game.
+Метод через апи посылает запрос на сервер с параметрами начала игры
 ```js
 public startGame(parameters: GameStartRequest): Observable<GameStartResponse> {
     return this.api.apiDemoGameStartPost(parameters)
@@ -157,7 +154,7 @@ public startGame(parameters: GameStartRequest): Observable<GameStartResponse> {
           }));
   }
 ```
-To request parameters, use the following interface:
+В для описания параметров используется следующий интерфейс:
 ```js
 export interface GameStartRequest {
     type?: GameStartRequest.TypeEnum;
@@ -169,7 +166,7 @@ export interface GameStartRequest {
 }
 ```
 #### End game
-Through api sends a request with parameters of start the game.
+Метод через апи посылает запрос на сервер с параметрами конца игры
 ```js
   public endGame(parameters: GameFinishRequest): Observable<GameFinishResponse> {
     return this.api.apiDemoGameEndPost(parameters).pipe(
@@ -179,7 +176,7 @@ Through api sends a request with parameters of start the game.
         }));
   }
 ```
-To request parameters, use the following interface:
+В для описания параметров используется следующий интерфейс:
 ```js
 export interface GameFinishRequest {
     gameId?: string;
@@ -190,40 +187,40 @@ export interface GameFinishRequest {
 }
 ```
 ## Create game component
-Let's create the logic of the component.
-Set user parameters on initialize the component
-and write logic of game.
+Создадим логику компонента. Зададим параметры пользователя во время
+инициализации компонента и напишем действия описывающие игру.
 ### On init
-On initialisation create public and private key for the user.
+Во время инициализации создадим пользователю приватный и публичный ключи.
 ```js
 ngOnInit() {
     this.cryptoService.init();
 }
 ```
 ### Start game
-The logic of the game is as follows:
-1. In the event parameter, values relating to the game conditions are passed.
-This is the type of the game, the selected bone values and the bet.
-2. In the method create parameters, necessary for cryptographic operations.
-This is a public key, a signed message and a nonce.
-3. These parameters are collected together and sent to the server as a request to start games.
-The server returns an object in which the following fields are required for the game:
-    * gameId - game identification
-    * items - array with the data of other players
-4. Send to the server request to the end of game with the previously obtained cryptographic
-parameters and gameId.
-5. Server should send a response, that contains the following information:
-    * isWinner - did the player win
-    * winNumbers - dropped bone
-    * winAmount - amount of winnings
-    * items - array with data from other players
-    * sharedSeedArray - seed-array from which a random value of the dropped bone is generated.
-The last two values can be validated on the client.
-6. We'll find out whether the data is correct by running the `sp8de-client-sdk`
-library to validate data about other players and the dropped value
+Логика игры заключается в следующем:
+1. В параметре event передаются значения, касающиеся условий игры.
+Это тип игры, выбранные значения костей и ставка.
+2. Внутри метода создаются параметры, необходимые для проведения крипто-операций.
+Это публичный ключ, подписанное сообщение и nonce.
+3. Эти параметры собираются вместе и передаются на сервер как запрос на начало
+игры. Сервер возращает объект, в котором для работы логики необходимы
+следующие поля:
+    * gameId - идентификатор игры
+    * items - массив с данными других участников.
+4. Далее с полученными ранее крипто-параметрами и gameId на сервер отправляется запрос на
+окончание игры.
+5. Сервер дожлжен прислать ответ, который содержит следующую информацию:
+    * isWinner - выиграл ли игрок
+    * winNumbers - выпавшее значение
+    * winAmount - размер выигрыша
+    * items - массив с данными других игроков
+    * sharedSeedArray - seed-массив из которого генерируется случайное значение выпавшей кости.
+Последние два значения можно валидировать на клиенте.
+6. Узнаем верны ли данные, проведя с помощью библиотеки `sp8de-client-sdk`
+Валидацию данных о других игроках и выпавшего значения
 
-Below is the code of the method that implements this logic, using
-previously created services:
+Далее приведен код метода, которые реализует эту логику, используя
+созданные ранее сервисы:
 ```js
 public start(event): void {
     const cryptoParameters = this.cryptoService.generateCryptoParameters();
@@ -256,7 +253,8 @@ public start(event): void {
       });
   }
 ```
-Now you can call method start(event) with game parameters and get to the console result:
+Теперь мы можем вызвать метод start(event) с параметрами игры и получить
+в консоль результат:
 ```js
 js:
 start({

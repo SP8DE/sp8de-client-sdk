@@ -310,10 +310,9 @@ Check if there are keys in vault
 | --- | --- | --- |
 | storageWallets | <code>object</code> | User in storage, if it there is |
 
-
 # Get started
 # Intro
-Next, we show how you can create a minimal-functional game "bones" on Angular2,
+Next, we show how you can create a minimal-functional game "Dices" on Angular2,
 in which the library `sp8de-client-sdk` will be used to ensure the reliability of
 gaming operations.
 ## Installing
@@ -516,21 +515,21 @@ ngOnInit() {
 ### Start game
 The logic of the game is as follows:
 1. In the event parameter, values relating to the game conditions are passed.
-This is the type of the game, the selected bone values and the bet.
+This is the type of the game, the selected dices values and the bet.
 2. In the method create parameters, necessary for cryptographic operations.
 This is a public key, a signed message and a nonce.
 3. These parameters are collected together and sent to the server as a request to start games.
 The server returns an object in which the following fields are required for the game:
-    * gameId - game identification
-    * items - array with the data of other players
+    * gameId — game identification
+    * items — array with the data of other players
 4. Send to the server request to the end of game with the previously obtained cryptographic
 parameters and gameId.
 5. Server should send a response, that contains the following information:
-    * isWinner - did the player win
-    * winNumbers - dropped bone
-    * winAmount - amount of winnings
-    * items - array with data from other players
-    * sharedSeedArray - seed-array from which a random value of the dropped bone is generated.
+    * isWinner — did the player win
+    * winNumbers — dropped dices
+    * winAmount — amount of winnings
+    * items — array with data from other players
+    * sharedSeedArray — seed-array from which a random value of the dropped dice is generated.
 The last two values can be validated on the client.
 6. We'll find out whether the data is correct by running the `sp8de-client-sdk`
 library to validate data about other players and the dropped value
