@@ -111,8 +111,8 @@ export class Sp8deClientSDK {
         }
         let pubKey = this.getPubKey(parameters.privateKey),
             message = `${pubKey};${parameters.seed};${parameters.nonce}`,
-            msg = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
-            signed = this.EthJS.ecsign(msg, this.EthJS.toBuffer(parameters.privateKey)),
+            hashMessage = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
+            signed = this.EthJS.ecsign(hashMessage, this.EthJS.toBuffer(parameters.privateKey)),
             tx = signed.r.toString('hex') + signed.s.toString('hex') + this.EthJS.stripHexPrefix(this.EthJS.intToHex(signed.v));
         return this.EthJS.addHexPrefix(tx);
     };
@@ -155,48 +155,51 @@ export class Sp8deClientSDK {
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
      * @param storageWallets {object | array} Object wallet contained in storage
+     * @param storageService {object} Object work with any storage
      */
-    addWalletToStorage(value, storageWallets = this.getWalletsInStorage()) {
+    addWalletToStorage(value, storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
         if (!value) throw error('invalid value');
         if (Array.isArray(storageWallets)) {
             storageWallets.push(value);
-            localStorage.setItem(nameKeysField, JSON.stringify(storageWallets));
+            storageService.set(nameKeysField, JSON.stringify(storageWallets));
         } else if (storageWallets) {
             if (!storageWallets[nameKeysField]) {
                 storageWallets[nameKeysField] = [];
             }
             storageWallets[nameKeysField].push(value);
-            localStorage.setItem(namUserField, JSON.stringify(storageWallets));
+            storageService.set(namUserField, JSON.stringify(storageWallets));
         } else {
-            localStorage.setItem(nameKeysField, JSON.stringify([value]));
+            storageService.set(nameKeysField, JSON.stringify([value]));
         }
     }
 
     /**
      * @description Removing last private key from array in localstorage
      * @param storageWallets {object | array} Object wallet contained in storage
+     * @param storageService {object} Object work with any storage
      */
-    removeLastWalletFromStorage(storageWallets = this.getWalletsInStorage()) {
+    removeLastWalletFromStorage(storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
         if (!this.isWalletsInStorage(storageWallets)) return;
         if (Array.isArray(storageWallets)) {
             storageWallets.pop();
-            localStorage.setItem(nameKeysField, JSON.stringify(storageWallets));
+            storageService.set(nameKeysField, JSON.stringify(storageWallets));
         } else {
             storageWallets[nameKeysField].pop();
-            localStorage.setItem(namUserField, JSON.stringify(storageWallets));
+            storageService.set(namUserField, JSON.stringify(storageWallets));
         }
     }
 
     /**
      * @description Clear array of private keys (delete key from localstorage
      * @param storageWallets {object | array} Object wallet contained in storage)
+     * @param storageService {object} Object work with any storage
      */
-    clearWalletStorage(storageWallets = this.getWalletsInStorage()) {
+    clearWalletStorage(storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
         if (Array.isArray(storageWallets)) {
-            localStorage.removeItem(nameKeysField);
+            storageService.remove(nameKeysField);
         } else {
             delete storageWallets[nameKeysField];
-            localStorage.setItem(namUserField, JSON.stringify(storageWallets));
+            storageService.set(namUserField, JSON.stringify(storageWallets));
         }
     }
 
@@ -238,9 +241,9 @@ export class Sp8deClientSDK {
         return true;
     }
 
-    getWalletsInStorage() {
-        const userKeys = JSON.parse(localStorage.getItem(namUserField)),
-            Wallets = localStorage.getItem(nameKeysField) ? JSON.parse(localStorage.getItem(nameKeysField)) : null;
+    getWalletsInStorage(storageService = LocalStorageMethods) {
+        const userKeys = JSON.parse(storageService.get(namUserField)),
+            Wallets = storageService.get(nameKeysField) ? JSON.parse(storageService.get(nameKeysField)) : null;
         return userKeys ? userKeys : Wallets;
     }
 
@@ -253,6 +256,33 @@ export class Sp8deClientSDK {
             ])
         );
     };
+}
+
+/*
+*
+* Local storage methods
+*
+* */
+class LocalStorageMethods {
+    static set(key, value) {
+        if (!localStorage) throw new Error('Does not localstorage in global')
+        localStorage.setItem(key, value);
+    }
+
+    static get(key) {
+        if (!localStorage) throw new Error('Does not localstorage in global')
+        return localStorage.getItem(key);
+    }
+
+    static remove(key) {
+        if (!localStorage) throw new Error('Does not localstorage in global')
+        localStorage.removeItem(key);
+    }
+
+    static clear(key) {
+        if (!localStorage) throw new Error('Does not localstorage in global')
+        localStorage.clear();
+    }
 }
 
 /*
