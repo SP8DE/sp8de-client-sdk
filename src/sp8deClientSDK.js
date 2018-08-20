@@ -161,15 +161,15 @@ export class Sp8deClientSDK {
         if (!value) throw error('invalid value');
         if (Array.isArray(storageWallets)) {
             storageWallets.push(value);
-            storageService.set(nameKeysField, JSON.stringify(storageWallets));
+            storageService.set(nameKeysField, storageWallets);
         } else if (storageWallets) {
             if (!storageWallets[nameKeysField]) {
                 storageWallets[nameKeysField] = [];
             }
             storageWallets[nameKeysField].push(value);
-            storageService.set(namUserField, JSON.stringify(storageWallets));
+            storageService.set(namUserField, storageWallets);
         } else {
-            storageService.set(nameKeysField, JSON.stringify([value]));
+            storageService.set(nameKeysField, [value]);
         }
     }
 
@@ -182,10 +182,10 @@ export class Sp8deClientSDK {
         if (!this.isWalletsInStorage(storageWallets)) return;
         if (Array.isArray(storageWallets)) {
             storageWallets.pop();
-            storageService.set(nameKeysField, JSON.stringify(storageWallets));
+            storageService.set(nameKeysField, storageWallets);
         } else {
             storageWallets[nameKeysField].pop();
-            storageService.set(namUserField, JSON.stringify(storageWallets));
+            storageService.set(namUserField, storageWallets);
         }
     }
 
@@ -199,7 +199,7 @@ export class Sp8deClientSDK {
             storageService.remove(nameKeysField);
         } else {
             delete storageWallets[nameKeysField];
-            storageService.set(namUserField, JSON.stringify(storageWallets));
+            storageService.set(namUserField, storageWallets);
         }
     }
 
@@ -242,8 +242,8 @@ export class Sp8deClientSDK {
     }
 
     getWalletsInStorage(storageService = LocalStorageMethods) {
-        const userKeys = JSON.parse(storageService.get(namUserField)),
-            Wallets = storageService.get(nameKeysField) ? JSON.parse(storageService.get(nameKeysField)) : null;
+        const userKeys = storageService.get(namUserField),
+            Wallets = storageService.get(nameKeysField) ? storageService.get(nameKeysField) : null;
         return userKeys ? userKeys : Wallets;
     }
 
@@ -266,12 +266,12 @@ export class Sp8deClientSDK {
 class LocalStorageMethods {
     static set(key, value) {
         if (!localStorage) throw new Error('Does not localstorage in global')
-        localStorage.setItem(key, value);
+        localStorage.setItem(key, JSON.stringify(value));
     }
 
     static get(key) {
         if (!localStorage) throw new Error('Does not localstorage in global')
-        return localStorage.getItem(key);
+        return JSON.parse(localStorage.getItem(key));
     }
 
     static remove(key) {
