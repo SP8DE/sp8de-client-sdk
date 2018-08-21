@@ -154,38 +154,38 @@ export class Sp8deClientSDK {
     /**
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
-     * @param storageWallets {object | array} Object wallet contained in storage
-     * @param storageService {object} Object work with any storage
+     * @param storageWallets {object | array} optional. Object wallet contained in storage
+     * @param storageService {object} optional. Object work with any storage
      */
     addWalletToStorage(value, storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
         if (!value) throw error('invalid value');
         if (Array.isArray(storageWallets)) {
             storageWallets.push(value);
-            storageService.set(nameKeysField, storageWallets);
+            storageService.setItem(nameKeysField, storageWallets);
         } else if (storageWallets) {
             if (!storageWallets[nameKeysField]) {
                 storageWallets[nameKeysField] = [];
             }
             storageWallets[nameKeysField].push(value);
-            storageService.set(nameUserField, storageWallets);
+            storageService.setItem(nameUserField, storageWallets);
         } else {
-            storageService.set(nameKeysField, [value]);
+            storageService.setItem(nameKeysField, [value]);
         }
     }
 
     /**
      * @description Removing last private key from array in localstorage
-     * @param storageWallets {object | array} Object wallet contained in storage
-     * @param storageService {object} Object work with any storage
+     * @param storageWallets {object | array} optional. Object wallet contained in storage
+     * @param storageService {object} optional. Object work with any storage
      */
     removeLastWalletFromStorage(storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
         if (!this.isWalletsInStorage(storageWallets)) return;
         if (Array.isArray(storageWallets)) {
             storageWallets.pop();
-            storageService.set(nameKeysField, storageWallets);
+            storageService.setItem(nameKeysField, storageWallets);
         } else {
             storageWallets[nameKeysField].pop();
-            storageService.set(nameUserField, storageWallets);
+            storageService.setItem(nameUserField, storageWallets);
         }
     }
 
@@ -196,17 +196,17 @@ export class Sp8deClientSDK {
      */
     clearWalletStorage(storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
         if (Array.isArray(storageWallets)) {
-            storageService.remove(nameKeysField);
+            storageService.removeItem(nameKeysField);
         } else {
             delete storageWallets[nameKeysField];
-            storageService.set(nameUserField, storageWallets);
+            storageService.setItem(nameUserField, storageWallets);
         }
     }
 
     /**
      * @description Returns active private key in localstorage
      * @returns {string} Active private key or null if no array
-     * @param array {array} Array wallets contained in storage
+     * @param array {array} optional. Array wallets contained in storage
      */
     getActiveWalletFromStorage(array = this.getWalletsListFromStorage()) {
         return array ? array.pop() : null;
@@ -214,7 +214,7 @@ export class Sp8deClientSDK {
 
     /**
      * @description Returns array of string contains all private keys from localstorage
-     * @param storageWallets {object | array} Object wallet contained in storage
+     * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @return {string[]} Array of private keys or null if no array
      */
     getWalletsListFromStorage(storageWallets = this.getWalletsInStorage()) {
@@ -229,7 +229,7 @@ export class Sp8deClientSDK {
     /**
      * @description  Check if there are keys in vault
      * @return {boolean} True if there is, false is not
-     * @param {object} storageWallets - User in storage, if it there is
+     * @param storageWallets {object}  optional. User in storage, if it there is
      */
     isWalletsInStorage(storageWallets = this.getWalletsInStorage()) {
         if (!storageWallets) return false;
@@ -242,8 +242,8 @@ export class Sp8deClientSDK {
     }
 
     getWalletsInStorage(storageService = LocalStorageMethods) {
-        const userKeys = storageService.get(nameUserField),
-            Wallets = storageService.get(nameKeysField) ? storageService.get(nameKeysField) : null;
+        const userKeys = storageService.getItem(nameUserField),
+            Wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
         return userKeys ? userKeys : Wallets;
     }
 
@@ -264,23 +264,23 @@ export class Sp8deClientSDK {
 *
 * */
 class LocalStorageMethods {
-    static set(key, value) {
-        if (!localStorage) throw new Error('Does not localstorage in global')
+    static setItem(key, value) {
+        if (!localStorage) throw new Error('Does not localstorage in global');
         localStorage.setItem(key, JSON.stringify(value));
     }
 
-    static get(key) {
-        if (!localStorage) throw new Error('Does not localstorage in global')
+    static getItem(key) {
+        if (!localStorage) throw new Error('Does not localstorage in global');
         return JSON.parse(localStorage.getItem(key));
     }
 
-    static remove(key) {
-        if (!localStorage) throw new Error('Does not localstorage in global')
+    static removeItem(key) {
+        if (!localStorage) throw new Error('Does not localstorage in global');
         localStorage.removeItem(key);
     }
 
     static clear(key) {
-        if (!localStorage) throw new Error('Does not localstorage in global')
+        if (!localStorage) throw new Error('Does not localstorage in global');
         localStorage.clear();
     }
 }
