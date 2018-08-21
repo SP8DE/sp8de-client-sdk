@@ -1,6 +1,6 @@
 let Buffer = require('buffer').Buffer,
     nameKeysField = 'Wallets',
-    namUserField = 'user';
+    nameUserField = 'user';
 
 /**
  * @class Sp8deClientSDK
@@ -167,7 +167,7 @@ export class Sp8deClientSDK {
                 storageWallets[nameKeysField] = [];
             }
             storageWallets[nameKeysField].push(value);
-            storageService.set(namUserField, storageWallets);
+            storageService.set(nameUserField, storageWallets);
         } else {
             storageService.set(nameKeysField, [value]);
         }
@@ -185,7 +185,7 @@ export class Sp8deClientSDK {
             storageService.set(nameKeysField, storageWallets);
         } else {
             storageWallets[nameKeysField].pop();
-            storageService.set(namUserField, storageWallets);
+            storageService.set(nameUserField, storageWallets);
         }
     }
 
@@ -199,7 +199,7 @@ export class Sp8deClientSDK {
             storageService.remove(nameKeysField);
         } else {
             delete storageWallets[nameKeysField];
-            storageService.set(namUserField, storageWallets);
+            storageService.set(nameUserField, storageWallets);
         }
     }
 
@@ -242,7 +242,7 @@ export class Sp8deClientSDK {
     }
 
     getWalletsInStorage(storageService = LocalStorageMethods) {
-        const userKeys = storageService.get(namUserField),
+        const userKeys = storageService.get(nameUserField),
             Wallets = storageService.get(nameKeysField) ? storageService.get(nameKeysField) : null;
         return userKeys ? userKeys : Wallets;
     }
