@@ -279,7 +279,7 @@ class LocalStorageMethods {
         localStorage.removeItem(key);
     }
 
-    static clear(key) {
+    static clear() {
         if (!localStorage) throw new Error('Does not localstorage in global');
         localStorage.clear();
     }
