@@ -28,7 +28,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>let Buffer = require('buffer').Buffer,
     nameKeysField = 'Wallets',
-    namUserField = 'user';
+    nameUserField = 'user';
 
 /**
  * @class Sp8deClientSDK
@@ -39,7 +39,6 @@ export class Sp8deClientSDK {
         this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
     }
 
-
     /**
      * @description Returns a new private key
      * @memberOf Sp8deClientSDK
@@ -48,7 +47,6 @@ export class Sp8deClientSDK {
     generatePrivateKey() {
         return this.privateKeyGenerator.Wallet.createRandom().privateKey;
     };
-
 
     /**
      * @description Returns a new wallet
@@ -89,8 +87,7 @@ export class Sp8deClientSDK {
      * */
     getPubKey(privateKey) {
         if (!privateKey) {
-            console.error('Invalid parameter');
-            return;
+            throw error('Invalid parameter');
         }
         return this.EthJS.addHexPrefix(this.EthJS.privateToAddress(privateKey).toString('hex'))
     };
@@ -108,8 +105,7 @@ export class Sp8deClientSDK {
             !Array.isArray(parameters.array) ||
             parameters.min === undefined ||
             parameters.max === undefined) {
-            console.error('Invalid parameters');
-            return;
+            throw error('Invalid parameters');
         }
         rand.init_by_array(parameters.array, parameters.array.length);
         for (let i = 0; i &lt; parameters.count; i++) {
@@ -139,13 +135,12 @@ export class Sp8deClientSDK {
         if (parameters.privateKey === undefined ||
             parameters.seed === undefined ||
             parameters.nonce === undefined) {
-            console.error('Invalid parameters', parameters);
-            return null;
+            throw error('Invalid parameters', parameters);
         }
         let pubKey = this.getPubKey(parameters.privateKey),
             message = `${pubKey};${parameters.seed};${parameters.nonce}`,
-            msg = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
-            signed = this.EthJS.ecsign(msg, this.EthJS.toBuffer(parameters.privateKey)),
+            hashMessage = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
+            signed = this.EthJS.ecsign(hashMessage, this.EthJS.toBuffer(parameters.privateKey)),
             tx = signed.r.toString('hex') + signed.s.toString('hex') + this.EthJS.stripHexPrefix(this.EthJS.intToHex(signed.v));
         return this.EthJS.addHexPrefix(tx);
     };
@@ -187,92 +182,96 @@ export class Sp8deClientSDK {
     /**
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
+     * @param storageWallets {object | array} optional. Object wallet contained in storage
+     * @param storageService {object} optional. Object work with any storage
      */
-    addWalletToStorage(value) {
-        let storageKeys = this.getWalletsInStorage();
-        if (Array.isArray(storageKeys)) {
-            storageKeys.push(value);
-            localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
-        } else if (storageKeys) {
-            if (!storageKeys[nameKeysField]) {
-                storageKeys[nameKeysField] = [];
+    addWalletToStorage(value, storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
+        if (!value) throw error('invalid value');
+        if (Array.isArray(storageWallets)) {
+            storageWallets.push(value);
+            storageService.setItem(nameKeysField, storageWallets);
+        } else if (storageWallets) {
+            if (!storageWallets[nameKeysField]) {
+                storageWallets[nameKeysField] = [];
             }
-            storageKeys[nameKeysField].push(value);
-            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+            storageWallets[nameKeysField].push(value);
+            storageService.setItem(nameUserField, storageWallets);
         } else {
-            localStorage.setItem(nameKeysField, JSON.stringify([value]));
+            storageService.setItem(nameKeysField, [value]);
         }
     }
 
     /**
      * @description Removing last private key from array in localstorage
+     * @param storageWallets {object | array} optional. Object wallet contained in storage
+     * @param storageService {object} optional. Object work with any storage
      */
-    removeLastWalletFromStorage() {
-        let storageKeys = this.getWalletsInStorage();
-        if (!this.isKeysInStorage(storageKeys)) return;
-        if (Array.isArray(storageKeys)) {
-            storageKeys.pop();
-            localStorage.setItem(nameKeysField, JSON.stringify(storageKeys));
+    removeLastWalletFromStorage(storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
+        if (!this.isWalletsInStorage(storageWallets)) return;
+        if (Array.isArray(storageWallets)) {
+            storageWallets.pop();
+            storageService.setItem(nameKeysField, storageWallets);
         } else {
-            storageKeys[nameKeysField].pop();
-            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+            storageWallets[nameKeysField].pop();
+            storageService.setItem(nameUserField, storageWallets);
         }
     }
 
     /**
-     * @description Clear array of private keys (delete key from localstorage)
+     * @description Clear array of private keys (delete key from localstorage
+     * @param storageWallets {object | array} Object wallet contained in storage)
+     * @param storageService {object} Object work with any storage
      */
-    clearWalletStorage() {
-        let storageKeys = this.getWalletsInStorage();
-        if (Array.isArray(storageKeys)) {
-            localStorage.removeItem(nameKeysField);
+    clearWalletStorage(storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
+        if (Array.isArray(storageWallets)) {
+            storageService.removeItem(nameKeysField);
         } else {
-            delete storageKeys[nameKeysField];
-            localStorage.setItem(namUserField, JSON.stringify(storageKeys));
+            delete storageWallets[nameKeysField];
+            storageService.setItem(nameUserField, storageWallets);
         }
     }
 
     /**
      * @description Returns active private key in localstorage
      * @returns {string} Active private key or null if no array
+     * @param array {array} optional. Array wallets contained in storage
      */
-    getActiveWalletFromStorage() {
-        let array = this.getWalletsListFromStorage();
+    getActiveWalletFromStorage(array = this.getWalletsListFromStorage()) {
         return array ? array.pop() : null;
     }
 
     /**
      * @description Returns array of string contains all private keys from localstorage
+     * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @return {string[]} Array of private keys or null if no array
      */
-    getWalletsListFromStorage() {
-        let storageKeys = this.getWalletsInStorage();
-        if (!this.isKeysInStorage(storageKeys)) return null;
-        if (Array.isArray(storageKeys)) {
-            return storageKeys;
-        } else if (storageKeys) {
-            return storageKeys[nameKeysField];
+    getWalletsListFromStorage(storageWallets = this.getWalletsInStorage()) {
+        if (!this.isWalletsInStorage(storageWallets)) return null;
+        if (Array.isArray(storageWallets)) {
+            return storageWallets;
+        } else if (storageWallets) {
+            return storageWallets[nameKeysField];
         } else return null;
     }
 
     /**
      * @description  Check if there are keys in vault
      * @return {boolean} True if there is, false is not
-     * @param {object} storageKeys - User in storage, if it there is
+     * @param storageWallets {object}  optional. User in storage, if it there is
      */
-    isKeysInStorage(storageKeys) {
-        if (!storageKeys) return false;
-        if (Array.isArray(storageKeys)) {
-            if (!!!storageKeys.length) return false;
+    isWalletsInStorage(storageWallets = this.getWalletsInStorage()) {
+        if (!storageWallets) return false;
+        if (Array.isArray(storageWallets)) {
+            if (!!!storageWallets.length) return false;
         } else {
-            if (!storageKeys[nameKeysField] || !!!storageKeys[nameKeysField].length) return false;
+            if (!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length) return false;
         }
         return true;
     }
 
-    getWalletsInStorage() {
-        const userKeys = JSON.parse(localStorage.getItem(namUserField)),
-            Wallets = localStorage.getItem(nameKeysField) ? JSON.parse(localStorage.getItem(nameKeysField)) : null;
+    getWalletsInStorage(storageService = LocalStorageMethods) {
+        const userKeys = storageService.getItem(nameUserField),
+            Wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
         return userKeys ? userKeys : Wallets;
     }
 
@@ -285,6 +284,33 @@ export class Sp8deClientSDK {
             ])
         );
     };
+}
+
+/*
+*
+* Local storage methods
+*
+* */
+class LocalStorageMethods {
+    static setItem(key, value) {
+        if (!localStorage) throw new Error('Does not localstorage in global');
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    static getItem(key) {
+        if (!localStorage) throw new Error('Does not localstorage in global');
+        return JSON.parse(localStorage.getItem(key));
+    }
+
+    static removeItem(key) {
+        if (!localStorage) throw new Error('Does not localstorage in global');
+        localStorage.removeItem(key);
+    }
+
+    static clear() {
+        if (!localStorage) throw new Error('Does not localstorage in global');
+        localStorage.clear();
+    }
 }
 
 /*
@@ -459,7 +485,7 @@ class mt19937 {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Aug 10 2018 16:18:46 GMT+0300 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Aug 21 2018 12:57:33 GMT+0300 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>
