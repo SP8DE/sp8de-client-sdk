@@ -573,12 +573,12 @@ Now you can call method start(event) with game parameters and get to the console
 js:
 start({
     type: 'Dice',
-    bet: [1, 2, 4],
+    bet: [1, 2],
     betAmount: 100
 })
 
 console:
 Validate items: true
 Validate win: [true, true, true]
-You win 100
+You win 50
 ```

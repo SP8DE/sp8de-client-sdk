@@ -8,7 +8,7 @@ For use `sp8de-client-sdk` functions it is necessary install him from NPM:
 ```
 npm install sp8de-client-sdk
 ```
-And for Angular2 + applications, you need to add references to cryptographic libraries to the index.html file:
+And for Angular2 + applications, you need to add references to cryptographic libraries to the `index.html` file:
 ```
 <script src="https://www.mobilefish.com/scripts/ethereumjs/ethereumjs-util.js"></script>
 <script src="https://cdn.ethers.io/scripts/ethers-v3.min.js"></script>
@@ -43,7 +43,7 @@ constructor(public sp8deClientSDK: Sp8deClientSDK) {
 ```
 Implements methods of the game.
 #### Init
-Method creates a private key, if it is not in storage and generates a public key for further work:
+Method creates a wallet with a private key, if it is not in storage and generates a public key for further work:
 ```js
 public init() {
     // Check wallets in storage
@@ -261,12 +261,12 @@ Now you can call method start(event) with game parameters and get to the console
 js:
 start({
     type: 'Dice',
-    bet: [1, 2, 4],
+    bet: [1, 2],
     betAmount: 100
 })
 
 console:
 Validate items: true
 Validate win: [true, true, true]
-You win 100
+You win 50
 ```
