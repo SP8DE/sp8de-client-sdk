@@ -1,4 +1,9 @@
+// if (window !== undefined) window.sp8deClientSDK = new Sp8deClientSDK();
+// else global.sp8deClientSDK = new Sp8deClientSDK();
 let Buffer = require('buffer').Buffer,
+    EthJSmin = require('../eth'),
+    EthJS=require('ethereumjs-util'),
+    privateKeyGenerator = require('ethers'),
     nameKeysField = 'Wallets',
     nameUserField = 'user';
 
@@ -7,8 +12,8 @@ let Buffer = require('buffer').Buffer,
  * */
 export class Sp8deClientSDK {
     constructor(eth = undefined, privateKeyGenerator = undefined) {
-        this.EthJS = !eth ? window.EthJS.Util : eth;
-        this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
+        EthJS = !eth ? window.EthJS.Util : eth;
+        privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
     }
 
     /**
@@ -17,7 +22,7 @@ export class Sp8deClientSDK {
      * @return {number} A public key of 66 characters long
      * */
     generatePrivateKey() {
-        return this.privateKeyGenerator.Wallet.createRandom().privateKey;
+        return privateKeyGenerator.Wallet.createRandom().privateKey;
     };
 
     /**
@@ -26,7 +31,7 @@ export class Sp8deClientSDK {
      * @return {object} Object contains wallet
      * */
     generateWallet() {
-        return this.privateKeyGenerator.Wallet.createRandom();
+        return privateKeyGenerator.Wallet.createRandom();
     };
 
     /**
@@ -48,7 +53,7 @@ export class Sp8deClientSDK {
      * @return {promise} promise with json
      * */
     decryptWallet(wallet, password) {
-        return this.privateKeyGenerator.Wallet.fromEncryptedWallet(wallet, password);
+        return privateKeyGenerator.Wallet.fromEncryptedWallet(wallet, password);
     };
 
     /**
@@ -61,7 +66,7 @@ export class Sp8deClientSDK {
         if (!privateKey) {
             throw error('Invalid parameter');
         }
-        return this.EthJS.addHexPrefix(this.EthJS.privateToAddress(privateKey).toString('hex'))
+        return EthJS.addHexPrefix(EthJS.privateToAddress(privateKey).toString('hex'))
     };
 
     /**
@@ -111,10 +116,10 @@ export class Sp8deClientSDK {
         }
         let pubKey = this.getPubKey(parameters.privateKey),
             message = `${pubKey};${parameters.seed};${parameters.nonce}`,
-            hashMessage = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
-            signed = this.EthJS.ecsign(hashMessage, this.EthJS.toBuffer(parameters.privateKey)),
-            tx = signed.r.toString('hex') + signed.s.toString('hex') + this.EthJS.stripHexPrefix(this.EthJS.intToHex(signed.v));
-        return this.EthJS.addHexPrefix(tx);
+            hashMessage = EthJS.hashPersonalMessage(EthJS.toBuffer(message)),
+            signed = EthJS.ecsign(hashMessage, EthJS.toBuffer(parameters.privateKey)),
+            tx = signed.r.toString('hex') + signed.s.toString('hex') + EthJS.stripHexPrefix(EthJS.intToHex(signed.v));
+        return EthJS.addHexPrefix(tx);
     };
 
     /**
@@ -132,15 +137,15 @@ export class Sp8deClientSDK {
             if (parameters.sign.length !== 65) throw new TypeError('parameters.sign length is not valid');
             parameters.sign[64] = parameters.sign[64] === 0 || parameters.sign[64] === 1 ? parameters.sign[64] + 27 : parameters.sign[64];
             msg = `${parameters.pubKey.toLowerCase()};${parameters.seed};${parameters.nonce}`;
-            hash = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(msg));
+            hash = EthJS.hashPersonalMessage(EthJS.toBuffer(msg));
 
-            newPubKey = this.EthJS.ecrecover(
+            newPubKey = EthJS.ecrecover(
                 hash,
                 parameters.sign[64],
                 parameters.sign.slice(0, 32),
                 parameters.sign.slice(32, 64)
             );
-            if (AccessoryFunctions.getNakedAddress(parameters.pubKey) !== this.EthJS.pubToAddress(newPubKey).toString('hex')) {
+            if (AccessoryFunctions.getNakedAddress(parameters.pubKey) !== EthJS.pubToAddress(newPubKey).toString('hex')) {
                 throw new TypeError('parameters.sign is not valid');
             }
         } catch (e) {
@@ -248,11 +253,11 @@ export class Sp8deClientSDK {
     }
 
     getTrezorHash(msg) {
-        return this.EthJS.sha3(
+        return EthJS.sha3(
             Buffer.concat([
-                this.EthJS.toBuffer('\u0019Ethereum Signed Message:\n'),
+                EthJS.toBuffer('\u0019Ethereum Signed Message:\n'),
                 AccessoryFunctions.getTrezorLenBuf(msg.length),
-                this.EthJS.toBuffer(msg)
+                EthJS.toBuffer(msg)
             ])
         );
     };

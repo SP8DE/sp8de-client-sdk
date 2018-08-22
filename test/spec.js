@@ -1,7 +1,8 @@
 describe('Test library', function () {
-    let Sp8de = require('../cdn/script'),
-        password = '1234',
-        sp8de = new Sp8de.Methods();
+    let  password = '1234';
+    let Sp8de = require('../src/sp8deClientSDK');
+    console.log(Sp8de)
+    let sp8de=new Sp8de.Sp8deClientSDK();
     describe("Create library", function () {
         it("Should be create object", function () {
             expect(sp8de).toBeDefined();

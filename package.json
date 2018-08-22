@@ -20,6 +20,8 @@
   ],
   "license": "ISC",
   "dependencies": {
+    "ethereumjs-util": "^5.2.0",
+    "ethers": "^3.0.26",
     "buffer": "^5.1.0"
   },
   "devDependencies": {
