@@ -1,9 +1,21 @@
 <component name="ProjectDictionaryState">
   <dictionary name="pavel">
     <words>
+      <w>cipherparams</w>
+      <w>ciphertext</w>
       <w>crypto</w>
+      <w>dklen</w>
+      <w>ethers</w>
+      <w>genrand</w>
+      <w>geth</w>
+      <w>kdfparams</w>
       <w>keythereum</w>
       <w>localstorage</w>
+      <w>makoto</w>
+      <w>matsumoto</w>
+      <w>taocp</w>
+      <w>trezor</w>
+      <w>wordsize</w>
     </words>
   </dictionary>
 </component>

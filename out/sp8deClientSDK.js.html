@@ -26,37 +26,39 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>let Buffer = require('buffer').Buffer,
-    nameKeysField = 'Wallets',
-    nameUserField = 'user';
-
+            <pre class="prettyprint source linenums"><code>"use strict";
+exports.__esModule = true;
+var BufferModule = require("buffer");
+var Buffer = BufferModule.Buffer, nameKeysField = 'Wallets', nameUserField = 'user';
 /**
  * @class Sp8deClientSDK
  * */
-export class Sp8deClientSDK {
-    constructor(eth = undefined, privateKeyGenerator = undefined) {
-        this.EthJS = !eth ? window.EthJS.Util : eth;
-        this.privateKeyGenerator = !privateKeyGenerator ? window.ethers : privateKeyGenerator;
+var Sp8deClientSDK = /** @class */ (function () {
+    function Sp8deClientSDK(eth, privateKeyGenerator) {
+        if (eth === void 0) { eth = undefined; }
+        if (privateKeyGenerator === void 0) { privateKeyGenerator = undefined; }
+        this.EthJS = !eth ? window['EthJS'].Util : eth;
+        this.privateKeyGenerator = !privateKeyGenerator ? window['ethers'] : privateKeyGenerator;
     }
-
     /**
      * @description Returns a new private key
      * @memberOf Sp8deClientSDK
      * @return {number} A public key of 66 characters long
      * */
-    generatePrivateKey() {
+    Sp8deClientSDK.prototype.generatePrivateKey = function () {
         return this.privateKeyGenerator.Wallet.createRandom().privateKey;
     };
-
+    ;
     /**
      * @description Returns a new wallet
      * @memberOf Sp8deClientSDK
      * @return {object} Object contains wallet
      * */
-    generateWallet() {
+    Sp8deClientSDK.prototype.generateWallet = function () {
+        // console.log(this.privateKeyGenerator.Wallet.createRandom())
         return this.privateKeyGenerator.Wallet.createRandom();
     };
-
+    ;
     /**
      * @description Returns a new wallet
      * @memberOf Sp8deClientSDK
@@ -64,10 +66,10 @@ export class Sp8deClientSDK {
      * @param {string} password
      * @return {promise} promise with json
      * */
-    encryptWallet(wallet, password) {
+    Sp8deClientSDK.prototype.encryptWallet = function (wallet, password) {
         return wallet.encrypt(password);
     };
-
+    ;
     /**
      * @description Returns a new wallet
      * @memberOf Sp8deClientSDK
@@ -75,256 +77,273 @@ export class Sp8deClientSDK {
      * @param {string} password
      * @return {promise} promise with json
      * */
-    decryptWallet(wallet, password) {
+    Sp8deClientSDK.prototype.decryptWallet = function (wallet, password) {
         return this.privateKeyGenerator.Wallet.fromEncryptedWallet(wallet, password);
     };
-
+    ;
     /**
      * @description Returns the public key obtains from the private key
      * @memberOf Sp8deClientSDK
      * @param {string} privateKey - private key
      * @return {string} A public key of 42 characters long
      * */
-    getPubKey(privateKey) {
+    Sp8deClientSDK.prototype.getPubKey = function (privateKey) {
         if (!privateKey) {
-            throw error('Invalid parameter');
+            throw new Error('Invalid parameter');
         }
-        return this.EthJS.addHexPrefix(this.EthJS.privateToAddress(privateKey).toString('hex'))
+        return this.EthJS.addHexPrefix(this.EthJS.privateToAddress(privateKey).toString('hex'));
     };
-
+    ;
     /**
      * @description Returns an array of random numbers from seed-array (use mt19937 algorithm)
      * @memberOf Sp8deClientSDK
      * @param {{array: array, min: number, max: number, count: number}} parameters - {array: [], min: number, max: number, count: number}
      * @return {number[]} An array of length given by a "count" containing random numbers
      * */
-    getRandomFromArray(parameters) {
-        let rand = new mt19937(),
-            result = [];
+    Sp8deClientSDK.prototype.getRandomFromArray = function (parameters) {
+        var rand = new mt19937(), result = [];
         if (parameters.array === undefined ||
             !Array.isArray(parameters.array) ||
             parameters.min === undefined ||
             parameters.max === undefined) {
-            throw error('Invalid parameters');
+            throw new Error('Invalid parameters');
         }
         rand.init_by_array(parameters.array, parameters.array.length);
-        for (let i = 0; i &lt; parameters.count; i++) {
-            result.push(AccessoryFunctions.getRandomIntInclusive(rand.random(), parameters.min, parameters.max))
+        for (var i = 0; i &lt; parameters.count; i++) {
+            result.push(AccessoryFunctions.getRandomIntInclusive(rand.random(), parameters.min, parameters.max));
         }
         return result;
     };
-
+    ;
     /**
      * @description Returns a random number to use as a seed
      * @memberOf Sp8deClientSDK
      * @return {number} Random seed number. Length 9-10
      * */
-    generateSeed() {
-        let rnd = new Uint32Array(1);
+    Sp8deClientSDK.prototype.generateSeed = function () {
+        var rnd = new Uint32Array(1);
         window.crypto.getRandomValues(rnd);
         return rnd[0];
     };
-
+    ;
     /**
      * @description Signs a message from privateKey, seed, nonce. Returns message signed with private key.
      * @memberOf Sp8deClientSDK
      * @param {{privateKey: string, seed: number, nonce: number}} parameters - {privateKey: string, seed: number, nonce: number}
      * @return {string} Message signed with private key
      * */
-    signMessage(parameters) {
+    Sp8deClientSDK.prototype.signMessage = function (parameters) {
         if (parameters.privateKey === undefined ||
             parameters.seed === undefined ||
             parameters.nonce === undefined) {
-            throw error('Invalid parameters', parameters);
+            throw new Error('Invalid parameters');
         }
-        let pubKey = this.getPubKey(parameters.privateKey),
-            message = `${pubKey};${parameters.seed};${parameters.nonce}`,
-            hashMessage = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)),
-            signed = this.EthJS.ecsign(hashMessage, this.EthJS.toBuffer(parameters.privateKey)),
-            tx = signed.r.toString('hex') + signed.s.toString('hex') + this.EthJS.stripHexPrefix(this.EthJS.intToHex(signed.v));
+        var pubKey = this.getPubKey(parameters.privateKey), message = pubKey + ";" + parameters.seed + ";" + parameters.nonce, hashMessage = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(message)), signed = this.EthJS.ecsign(hashMessage, this.EthJS.toBuffer(parameters.privateKey)), tx = signed.r.toString('hex') + signed.s.toString('hex') + this.EthJS.stripHexPrefix(this.EthJS.intToHex(signed.v));
         return this.EthJS.addHexPrefix(tx);
     };
-
+    ;
     /**
      * @description Validates the message. Use sign, nonce, public key and seed. Returns true if the validation was successful.
      * @memberOf Sp8deClientSDK
      * @param {{sign: string, pubKey: string, seed: number, nonce: number}} parameters - {sign: string, pubKey: string, seed: number, nonce: number}
      * @return {boolean} True if successful, false if unsuccessful
      * */
-    validateSign(parameters) {
-        let hash, msg, newPubKey;
+    Sp8deClientSDK.prototype.validateSign = function (parameters) {
+        var hash, msg, newPubKey;
         try {
-            if (!parameters.sign) throw new TypeError('Empty parameters.sign');
-            if (parameters.sign.length % 2 !== 0) throw new TypeError('Invalid hex string');
+            if (!parameters.sign)
+                throw new TypeError('Empty parameters.sign');
+            if (parameters.sign.length % 2 !== 0)
+                throw new TypeError('Invalid hex string');
             parameters.sign = Buffer.from(AccessoryFunctions.getNakedAddress(parameters.sign), 'hex');
-            if (parameters.sign.length !== 65) throw new TypeError('parameters.sign length is not valid');
+            if (parameters.sign.length !== 65)
+                throw new TypeError('parameters.sign length is not valid');
             parameters.sign[64] = parameters.sign[64] === 0 || parameters.sign[64] === 1 ? parameters.sign[64] + 27 : parameters.sign[64];
-            msg = `${parameters.pubKey.toLowerCase()};${parameters.seed};${parameters.nonce}`;
+            msg = parameters.pubKey.toLowerCase() + ";" + parameters.seed + ";" + parameters.nonce;
             hash = this.EthJS.hashPersonalMessage(this.EthJS.toBuffer(msg));
-
-            newPubKey = this.EthJS.ecrecover(
-                hash,
-                parameters.sign[64],
-                parameters.sign.slice(0, 32),
-                parameters.sign.slice(32, 64)
-            );
+            newPubKey = this.EthJS.ecrecover(hash, parameters.sign[64], parameters.sign.slice(0, 32), parameters.sign.slice(32, 64));
             if (AccessoryFunctions.getNakedAddress(parameters.pubKey) !== this.EthJS.pubToAddress(newPubKey).toString('hex')) {
                 throw new TypeError('parameters.sign is not valid');
             }
-        } catch (e) {
-            if (e instanceof SyntaxError) console.error('JSON is not valid');
-            else console.error(e);
+        }
+        catch (e) {
+            if (e instanceof SyntaxError)
+                console.error('JSON is not valid');
+            else
+                console.error(e);
             return false;
         }
         return true;
     };
-
+    ;
     /**
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @param storageService {object} optional. Object work with any storage
      */
-    addWalletToStorage(value, storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
-        if (!value) throw error('invalid value');
+    Sp8deClientSDK.prototype.addWalletToStorage = function (value, storageWallets, storageService) {
+        if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
+        if (storageService === void 0) { storageService = LocalStorageMethods; }
+        if (!value)
+            throw new Error('invalid value');
         if (Array.isArray(storageWallets)) {
             storageWallets.push(value);
             storageService.setItem(nameKeysField, storageWallets);
-        } else if (storageWallets) {
+        }
+        else if (storageWallets) {
             if (!storageWallets[nameKeysField]) {
                 storageWallets[nameKeysField] = [];
             }
             storageWallets[nameKeysField].push(value);
             storageService.setItem(nameUserField, storageWallets);
-        } else {
+        }
+        else {
             storageService.setItem(nameKeysField, [value]);
         }
-    }
-
+    };
     /**
      * @description Removing last private key from array in localstorage
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @param storageService {object} optional. Object work with any storage
      */
-    removeLastWalletFromStorage(storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
-        if (!this.isWalletsInStorage(storageWallets)) return;
+    Sp8deClientSDK.prototype.removeLastWalletFromStorage = function (storageWallets, storageService) {
+        if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
+        if (storageService === void 0) { storageService = LocalStorageMethods; }
+        if (!this.isWalletsInStorage(storageWallets))
+            return;
         if (Array.isArray(storageWallets)) {
             storageWallets.pop();
             storageService.setItem(nameKeysField, storageWallets);
-        } else {
+        }
+        else {
             storageWallets[nameKeysField].pop();
             storageService.setItem(nameUserField, storageWallets);
         }
-    }
-
+    };
     /**
      * @description Clear array of private keys (delete key from localstorage
      * @param storageWallets {object | array} Object wallet contained in storage)
      * @param storageService {object} Object work with any storage
      */
-    clearWalletStorage(storageWallets = this.getWalletsInStorage(), storageService = LocalStorageMethods) {
+    Sp8deClientSDK.prototype.clearWalletStorage = function (storageWallets, storageService) {
+        if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
+        if (storageService === void 0) { storageService = LocalStorageMethods; }
         if (Array.isArray(storageWallets)) {
             storageService.removeItem(nameKeysField);
-        } else {
+        }
+        else {
             delete storageWallets[nameKeysField];
             storageService.setItem(nameUserField, storageWallets);
         }
-    }
-
+    };
     /**
      * @description Returns active private key in localstorage
      * @returns {string} Active private key or null if no array
-     * @param array {array} optional. Array wallets contained in storage
+     * @param Wallets {array} optional. Array wallets contained in storage
      */
-    getActiveWalletFromStorage(array = this.getWalletsListFromStorage()) {
-        return array ? array.pop() : null;
-    }
-
+    Sp8deClientSDK.prototype.getActiveWalletFromStorage = function (Wallets) {
+        if (Wallets === void 0) { Wallets = this.getWalletsListFromStorage(); }
+        return Wallets ? Wallets.pop() : null;
+    };
     /**
      * @description Returns array of string contains all private keys from localstorage
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @return {string[]} Array of private keys or null if no array
      */
-    getWalletsListFromStorage(storageWallets = this.getWalletsInStorage()) {
-        if (!this.isWalletsInStorage(storageWallets)) return null;
+    Sp8deClientSDK.prototype.getWalletsListFromStorage = function (storageWallets) {
+        if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
+        if (!this.isWalletsInStorage(storageWallets))
+            return null;
         if (Array.isArray(storageWallets)) {
             return storageWallets;
-        } else if (storageWallets) {
+        }
+        else if (storageWallets) {
             return storageWallets[nameKeysField];
-        } else return null;
-    }
-
+        }
+        else
+            return null;
+    };
     /**
      * @description  Check if there are keys in vault
      * @return {boolean} True if there is, false is not
      * @param storageWallets {object}  optional. User in storage, if it there is
      */
-    isWalletsInStorage(storageWallets = this.getWalletsInStorage()) {
-        if (!storageWallets) return false;
+    Sp8deClientSDK.prototype.isWalletsInStorage = function (storageWallets) {
+        if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
+        if (!storageWallets)
+            return false;
         if (Array.isArray(storageWallets)) {
-            if (!!!storageWallets.length) return false;
-        } else {
-            if (!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length) return false;
+            if (!!!storageWallets.length)
+                return false;
+        }
+        else {
+            if (!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length)
+                return false;
         }
         return true;
-    }
-
-    getWalletsInStorage(storageService = LocalStorageMethods) {
-        const userKeys = storageService.getItem(nameUserField),
-            Wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
-        return userKeys ? userKeys : Wallets;
-    }
-
-    getTrezorHash(msg) {
-        return this.EthJS.sha3(
-            Buffer.concat([
-                this.EthJS.toBuffer('\u0019Ethereum Signed Message:\n'),
-                AccessoryFunctions.getTrezorLenBuf(msg.length),
-                this.EthJS.toBuffer(msg)
-            ])
-        );
     };
-}
-
+    Sp8deClientSDK.prototype.getWalletsInStorage = function (storageService) {
+        if (storageService === void 0) { storageService = LocalStorageMethods; }
+        var userKeys = storageService.getItem(nameUserField), Wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
+        return userKeys ? userKeys : Wallets;
+    };
+    Sp8deClientSDK.prototype.getTrezorHash = function (msg) {
+        return this.EthJS.sha3(Buffer.concat([
+            this.EthJS.toBuffer('\u0019Ethereum Signed Message:\n'),
+            AccessoryFunctions.getTrezorLenBuf(msg.length),
+            this.EthJS.toBuffer(msg)
+        ]));
+    };
+    ;
+    return Sp8deClientSDK;
+}());
+exports.Sp8deClientSDK = Sp8deClientSDK;
 /*
 *
 * Local storage methods
 *
 * */
-class LocalStorageMethods {
-    static setItem(key, value) {
-        if (!localStorage) throw new Error('Does not localstorage in global');
+var LocalStorageMethods = /** @class */ (function () {
+    function LocalStorageMethods() {
+    }
+    LocalStorageMethods.setItem = function (key, value) {
+        if (!localStorage)
+            throw new Error('Does not localstorage in global');
         localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    static getItem(key) {
-        if (!localStorage) throw new Error('Does not localstorage in global');
+    };
+    LocalStorageMethods.getItem = function (key) {
+        if (!localStorage)
+            throw new Error('Does not localstorage in global');
         return JSON.parse(localStorage.getItem(key));
-    }
-
-    static removeItem(key) {
-        if (!localStorage) throw new Error('Does not localstorage in global');
+    };
+    LocalStorageMethods.removeItem = function (key) {
+        if (!localStorage)
+            throw new Error('Does not localstorage in global');
         localStorage.removeItem(key);
-    }
-
-    static clear() {
-        if (!localStorage) throw new Error('Does not localstorage in global');
+    };
+    LocalStorageMethods.clear = function () {
+        if (!localStorage)
+            throw new Error('Does not localstorage in global');
         localStorage.clear();
-    }
-}
-
+    };
+    return LocalStorageMethods;
+}());
 /*
 *
 * Accessory functions for methods
 *
 */
-class AccessoryFunctions {
-    static getNakedAddress(address) {
+var AccessoryFunctions = /** @class */ (function () {
+    function AccessoryFunctions() {
+    }
+    AccessoryFunctions.getNakedAddress = function (address) {
         return address.toLowerCase().replace('0x', '');
     };
-
-    static getTrezorLenBuf(msgLen) {
-        if (msgLen &lt; 253) return Buffer.from([msgLen &amp; 0xff]);
+    ;
+    AccessoryFunctions.getTrezorLenBuf = function (msgLen) {
+        if (msgLen &lt; 253)
+            return Buffer.from([msgLen &amp; 0xff]);
         else if (msgLen &lt; 0x10000)
             return Buffer.from([253, msgLen &amp; 0xff, (msgLen >> 8) &amp; 0xff]);
         else {
@@ -337,22 +356,22 @@ class AccessoryFunctions {
             ]);
         }
     };
-
-    static getRandomIntInclusive(rnd, min, max) {
+    ;
+    AccessoryFunctions.getRandomIntInclusive = function (rnd, min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(rnd * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
     };
-}
-
+    ;
+    return AccessoryFunctions;
+}());
 /*
 *
 * mt19937 methods
 *
 */
-
-class mt19937 {
-    constructor(seed) {
+var mt19937 = /** @class */ (function () {
+    function mt19937(seed) {
         if (seed == undefined) {
             seed = new Date().getTime();
         }
@@ -365,16 +384,13 @@ class mt19937 {
         /* most significant w-r bits */
         this.LOWER_MASK = 0x7fffffff;
         /* least significant r bits */
-
         this.mt = new Array(this.N);
         /* the array for the state vector */
         this.mti = this.N + 1;
         /* mti==N+1 means mt[N] is not initialized */
-
         this.init_genrand(seed);
     }
-
-    init_genrand(s) {
+    mt19937.prototype.init_genrand = function (s) {
         this.mt[0] = s >>> 0;
         for (this.mti = 1; this.mti &lt; this.N; this.mti++) {
             s = this.mt[this.mti - 1] ^ (this.mt[this.mti - 1] >>> 30);
@@ -386,16 +402,15 @@ class mt19937 {
             this.mt[this.mti] >>>= 0;
             /* for >32 bit machines */
         }
-    }
-
-    init_by_array(init_key, key_length) {
+    };
+    mt19937.prototype.init_by_array = function (init_key, key_length) {
         var i, j, k;
         this.init_genrand(19650218);
         i = 1;
         j = 0;
         k = (this.N > key_length ? this.N : key_length);
         for (; k; k--) {
-            var s = this.mt[i - 1] ^ (this.mt[i - 1] >>> 30)
+            var s = this.mt[i - 1] ^ (this.mt[i - 1] >>> 30);
             this.mt[i] = (this.mt[i] ^ (((((s &amp; 0xffff0000) >>> 16) * 1664525) &lt;&lt; 16) + ((s &amp; 0x0000ffff) * 1664525))) + init_key[j] + j;
             /* non linear */
             this.mt[i] >>>= 0;
@@ -406,7 +421,8 @@ class mt19937 {
                 this.mt[0] = this.mt[this.N - 1];
                 i = 1;
             }
-            if (j >= key_length) j = 0;
+            if (j >= key_length)
+                j = 0;
         }
         for (k = this.N - 1; k; k--) {
             var s = this.mt[i - 1] ^ (this.mt[i - 1] >>> 30);
@@ -422,25 +438,20 @@ class mt19937 {
         }
         this.mt[0] = 0x80000000;
         /* MSB is 1; assuring non-zero initial array */
-    }
-
-    random() {
+    };
+    mt19937.prototype.random = function () {
         return this.genrand_int32() * (1.0 / 4294967296.0);
         /* divided by 2^32 */
-    }
-
-    genrand_int32() {
+    };
+    mt19937.prototype.genrand_int32 = function () {
         var y;
-        var mag01 = new Array(0x0, this.MATRIX_A);
+        var mag01 = [0x0, this.MATRIX_A];
         /* mag01[x] = x * MATRIX_A  for x=0,1 */
-
         if (this.mti >= this.N) { /* generate N words at one time */
-            var kk;
-
+            var kk = void 0;
             if (this.mti == this.N + 1) /* if init_genrand() has not been called, */
                 this.init_genrand(5489);
             /* a default initial seed is used */
-
             for (kk = 0; kk &lt; this.N - this.M; kk++) {
                 y = (this.mt[kk] &amp; this.UPPER_MASK) | (this.mt[kk + 1] &amp; this.LOWER_MASK);
                 this.mt[kk] = this.mt[kk + this.M] ^ (y >>> 1) ^ mag01[y &amp; 0x1];
@@ -451,24 +462,18 @@ class mt19937 {
             }
             y = (this.mt[this.N - 1] &amp; this.UPPER_MASK) | (this.mt[0] &amp; this.LOWER_MASK);
             this.mt[this.N - 1] = this.mt[this.M - 1] ^ (y >>> 1) ^ mag01[y &amp; 0x1];
-
             this.mti = 0;
         }
-
         y = this.mt[this.mti++];
-
         /* Tempering */
         y ^= (y >>> 11);
         y ^= (y &lt;&lt; 7) &amp; 0x9d2c5680;
         y ^= (y &lt;&lt; 15) &amp; 0xefc60000;
         y ^= (y >>> 18);
-
         return y >>> 0;
-    }
-}
-
-
-
+    };
+    return mt19937;
+}());
 </code></pre>
         </article>
     </section>
@@ -485,7 +490,7 @@ class mt19937 {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Aug 21 2018 12:57:33 GMT+0300 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Aug 21 2018 17:04:47 GMT+0300 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>
