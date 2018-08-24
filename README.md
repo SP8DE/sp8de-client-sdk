@@ -8,7 +8,7 @@ SDK for client
 ```
 npm install sp8de-client-sdk
 ```
-For angular2 + applications, you need to add references to cryptographic libraries to the index.html file:
+For use NPM-package in applications, you need to add references to cryptographic libraries to the index.html file:
 ```
 <script src="https://www.mobilefish.com/scripts/ethereumjs/ethereumjs-util.js"></script>
 <script src="https://cdn.ethers.io/scripts/ethers-v3.min.js"></script>
@@ -54,7 +54,7 @@ If in localstorage has a `user` key, then wallet will be added to him in key `wa
 
 ## About
 
-A simple set of ... , mainly for frontend apps.
+The SDK contains functions that allow you to perform signature signing operations, verify signatures of other services. Also contains methods for adding created wallets to localstorage.
 
 ##  Examples
 
