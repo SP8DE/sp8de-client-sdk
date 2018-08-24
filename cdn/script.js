@@ -4,11 +4,12 @@ import {Sp8deClientSDK} from '../src/sp8deClientSDK';
 
 export class Methods extends Sp8deClientSDK {
     constructor() {
-        super(EthJS, privateKeyGenerator);
+        super();
     }
 }
-
-if (window !== undefined) window.sp8deClientSDK = new Methods();
-else global.sp8deClientSDK = new Methods();
+let SDK= new Methods();
+SDK.init(EthJS, privateKeyGenerator);
+if (window !== undefined) window.sp8deClientSDK = SDK;
+else global.sp8deClientSDK = SDK;
 
 
