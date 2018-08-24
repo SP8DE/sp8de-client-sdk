@@ -1,15 +1,17 @@
 "use strict";
 exports.__esModule = true;
 var BufferModule = require("buffer");
-var Buffer = BufferModule.Buffer, EthJS, privateKeyGenerator, nameKeysField = 'Wallets', nameUserField = 'user';
+var Buffer = BufferModule.Buffer, EthJS = window['EthJS'] ? window['EthJS'].Util : undefined, privateKeyGenerator = window['ethers'] ? window['ethers'] : undefined, nameKeysField = 'Wallets', nameUserField = 'user';
 /**
  * @class Sp8deClientSDK
  * */
 var Sp8deClientSDK = /** @class */ (function () {
-    function Sp8deClientSDK(eth, privateKeyGeneratorExternal) {
+    function Sp8deClientSDK() {
+    }
+    Sp8deClientSDK.prototype.init = function (eth, privateKeyGeneratorExternal) {
         EthJS = !eth ? window['EthJS'].Util : eth;
         privateKeyGenerator = !privateKeyGeneratorExternal ? window['ethers'] : privateKeyGeneratorExternal;
-    }
+    };
     /**
      * @description Returns a new private key
      * @memberOf Sp8deClientSDK
@@ -25,7 +27,6 @@ var Sp8deClientSDK = /** @class */ (function () {
      * @return {object} Object contains wallet
      * */
     Sp8deClientSDK.prototype.generateWallet = function () {
-        // console.log(privateKeyGenerator.Wallet.createRandom())
         return privateKeyGenerator.Wallet.createRandom();
     };
     ;
@@ -59,7 +60,7 @@ var Sp8deClientSDK = /** @class */ (function () {
      * */
     Sp8deClientSDK.prototype.getPubKey = function (privateKey) {
         if (!privateKey) {
-            throw new Error('Invalid parameter');
+            throw new Error('getPubKey: Invalid parameter');
         }
         return EthJS.addHexPrefix(EthJS.privateToAddress(privateKey).toString('hex'));
     };
@@ -76,7 +77,7 @@ var Sp8deClientSDK = /** @class */ (function () {
             !Array.isArray(parameters.array) ||
             parameters.min === undefined ||
             parameters.max === undefined) {
-            throw new Error('Invalid parameters');
+            throw new Error('getRandomFromArray: Invalid parameters');
         }
         rand.init_by_array(parameters.array, parameters.array.length);
         for (var i = 0; i < parameters.count; i++) {
@@ -106,7 +107,7 @@ var Sp8deClientSDK = /** @class */ (function () {
         if (parameters.privateKey === undefined ||
             parameters.seed === undefined ||
             parameters.nonce === undefined) {
-            throw new Error('Invalid parameters');
+            throw new Error('signMessage: Invalid parameters');
         }
         var pubKey = this.getPubKey(parameters.privateKey), message = pubKey + ";" + parameters.seed + ";" + parameters.nonce, hashMessage = EthJS.hashPersonalMessage(EthJS.toBuffer(message)), signed = EthJS.ecsign(hashMessage, EthJS.toBuffer(parameters.privateKey)), tx = signed.r.toString('hex') + signed.s.toString('hex') + EthJS.stripHexPrefix(EthJS.intToHex(signed.v));
         return EthJS.addHexPrefix(tx);
@@ -138,9 +139,9 @@ var Sp8deClientSDK = /** @class */ (function () {
         }
         catch (e) {
             if (e instanceof SyntaxError)
-                console.error('JSON is not valid');
+                console.error('validateSign: JSON is not valid');
             else
-                console.error(e);
+                console.error('validateSign:', e);
             return false;
         }
         return true;
@@ -152,60 +153,68 @@ var Sp8deClientSDK = /** @class */ (function () {
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @param storageService {object} optional. Object work with any storage
      */
-    Sp8deClientSDK.prototype.addWalletToStorage = function (value, storageWallets, storageService) {
+    Sp8deClientSDK.prototype.addWalletToStorage = function (value, storageWallets) {
         if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
-        if (storageService === void 0) { storageService = LocalStorageMethods; }
         if (!value)
-            throw new Error('invalid value');
-        if (Array.isArray(storageWallets)) {
-            storageWallets.push(value);
-            storageService.setItem(nameKeysField, storageWallets);
-        }
-        else if (storageWallets) {
-            if (!storageWallets[nameKeysField]) {
-                storageWallets[nameKeysField] = [];
-            }
-            storageWallets[nameKeysField].push(value);
-            storageService.setItem(nameUserField, storageWallets);
-        }
-        else {
-            storageService.setItem(nameKeysField, [value]);
-        }
+            throw new Error('addWalletToStorage: invalid value');
+        this.isUser(storageWallets) ? this.addWalletToUser(value, storageWallets) : this.addWalletToWallets(value, storageWallets);
+    };
+    Sp8deClientSDK.prototype.addWalletToWallets = function (value, storageWallets, storageService) {
+        if (storageService === void 0) { storageService = LocalStorageMethods; }
+        storageWallets = this.addWalletToArray(value, storageWallets);
+        storageService.setItem(nameKeysField, storageWallets);
+    };
+    Sp8deClientSDK.prototype.addWalletToUser = function (value, storageWallets, storageService) {
+        if (storageService === void 0) { storageService = LocalStorageMethods; }
+        storageWallets[nameKeysField] = this.addWalletToArray(value, storageWallets && nameKeysField in storageWallets ? storageWallets[nameKeysField] : []);
+        storageService.setItem(nameUserField, storageWallets);
+    };
+    Sp8deClientSDK.prototype.addWalletToArray = function (value, storageWallets) {
+        return storageWallets ? storageWallets.concat([value]) : [value];
     };
     /**
      * @description Removing last private key from array in localstorage
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @param storageService {object} optional. Object work with any storage
      */
-    Sp8deClientSDK.prototype.removeLastWalletFromStorage = function (storageWallets, storageService) {
+    Sp8deClientSDK.prototype.removeLastWalletFromStorage = function (storageWallets) {
         if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
-        if (storageService === void 0) { storageService = LocalStorageMethods; }
         if (!this.isWalletsInStorage(storageWallets))
             return;
-        if (Array.isArray(storageWallets)) {
-            storageWallets.pop();
-            storageService.setItem(nameKeysField, storageWallets);
-        }
-        else {
-            storageWallets[nameKeysField].pop();
-            storageService.setItem(nameUserField, storageWallets);
-        }
+        this.isUser(storageWallets) ? this.removeWalletFromUser(storageWallets) : this.removeWalletFromWallets(storageWallets);
+    };
+    Sp8deClientSDK.prototype.isUser = function (storageWallets) {
+        return storageWallets ? !Array.isArray(storageWallets) : false;
+    };
+    Sp8deClientSDK.prototype.removeWalletFromWallets = function (storageWallets) {
+        this.removeLastItemAndStore(storageWallets, nameKeysField);
+    };
+    Sp8deClientSDK.prototype.removeWalletFromUser = function (storageWallets) {
+        this.removeLastItemAndStore(storageWallets[nameKeysField], nameUserField, storageWallets);
+    };
+    Sp8deClientSDK.prototype.removeLastItemAndStore = function (storage, name, storageWallets, storageService) {
+        if (storageWallets === void 0) { storageWallets = storage; }
+        if (storageService === void 0) { storageService = LocalStorageMethods; }
+        storage.pop();
+        storageService.setItem(name, storageWallets);
     };
     /**
      * @description Clear array of private keys (delete key from localstorage
      * @param storageWallets {object | array} Object wallet contained in storage)
      * @param storageService {object} Object work with any storage
      */
-    Sp8deClientSDK.prototype.clearWalletStorage = function (storageWallets, storageService) {
+    Sp8deClientSDK.prototype.clearWalletStorage = function (storageWallets) {
         if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
+        this.isUser(storageWallets) ? this.clearStorageFromUser(storageWallets) : this.clearStorageFromWallets();
+    };
+    Sp8deClientSDK.prototype.clearStorageFromWallets = function (storageService) {
         if (storageService === void 0) { storageService = LocalStorageMethods; }
-        if (Array.isArray(storageWallets)) {
-            storageService.removeItem(nameKeysField);
-        }
-        else {
-            delete storageWallets[nameKeysField];
-            storageService.setItem(nameUserField, storageWallets);
-        }
+        storageService.setItem(nameKeysField, []);
+    };
+    Sp8deClientSDK.prototype.clearStorageFromUser = function (storageWallets, storageService) {
+        if (storageService === void 0) { storageService = LocalStorageMethods; }
+        storageWallets[nameKeysField] = [];
+        storageService.setItem(nameUserField, storageWallets);
     };
     /**
      * @description Returns active private key in localstorage
@@ -225,14 +234,13 @@ var Sp8deClientSDK = /** @class */ (function () {
         if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
         if (!this.isWalletsInStorage(storageWallets))
             return null;
-        if (Array.isArray(storageWallets)) {
-            return storageWallets;
-        }
-        else if (storageWallets) {
-            return storageWallets[nameKeysField];
-        }
-        else
-            return null;
+        return this.isUser(storageWallets) ? this.getListFromUser(storageWallets) : this.getListFromWallets(storageWallets);
+    };
+    Sp8deClientSDK.prototype.getListFromWallets = function (storageWallets) {
+        return storageWallets;
+    };
+    Sp8deClientSDK.prototype.getListFromUser = function (storageWallets) {
+        return storageWallets[nameKeysField] ? storageWallets[nameKeysField] : null;
     };
     /**
      * @description  Check if there are keys in vault
@@ -243,20 +251,18 @@ var Sp8deClientSDK = /** @class */ (function () {
         if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
         if (!storageWallets)
             return false;
-        if (Array.isArray(storageWallets)) {
-            if (!!!storageWallets.length)
-                return false;
-        }
-        else {
-            if (!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length)
-                return false;
-        }
-        return true;
+        return this.isUser(storageWallets) ? this.isWalletsInUser(storageWallets) : this.isWalletsInWallets(storageWallets);
+    };
+    Sp8deClientSDK.prototype.isWalletsInWallets = function (storageWallets) {
+        return !!storageWallets.length;
+    };
+    Sp8deClientSDK.prototype.isWalletsInUser = function (storageWallets) {
+        return !(!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length);
     };
     Sp8deClientSDK.prototype.getWalletsInStorage = function (storageService) {
         if (storageService === void 0) { storageService = LocalStorageMethods; }
-        var userKeys = storageService.getItem(nameUserField), Wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
-        return userKeys ? userKeys : Wallets;
+        var userKeys = storageService.getItem(nameUserField), wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
+        return userKeys ? userKeys : wallets;
     };
     Sp8deClientSDK.prototype.getTrezorHash = function (msg) {
         return EthJS.sha3(Buffer.concat([
@@ -278,24 +284,22 @@ var LocalStorageMethods = /** @class */ (function () {
     function LocalStorageMethods() {
     }
     LocalStorageMethods.setItem = function (key, value) {
-        if (!localStorage)
-            throw new Error('Does not localstorage in global');
-        localStorage.setItem(key, JSON.stringify(value));
+        this.isLocalStorage() ? localStorage.setItem(key, JSON.stringify(value)) : null;
     };
     LocalStorageMethods.getItem = function (key) {
-        if (!localStorage)
-            throw new Error('Does not localstorage in global');
-        return JSON.parse(localStorage.getItem(key));
+        return this.isLocalStorage() ? JSON.parse(localStorage.getItem(key)) : null;
     };
     LocalStorageMethods.removeItem = function (key) {
-        if (!localStorage)
-            throw new Error('Does not localstorage in global');
-        localStorage.removeItem(key);
+        this.isLocalStorage() ? localStorage.removeItem(key) : null;
     };
     LocalStorageMethods.clear = function () {
-        if (!localStorage)
+        this.isLocalStorage() ? localStorage.clear() : null;
+    };
+    LocalStorageMethods.isLocalStorage = function () {
+        if (localStorage)
+            return true;
+        else
             throw new Error('Does not localstorage in global');
-        localStorage.clear();
     };
     return LocalStorageMethods;
 }());

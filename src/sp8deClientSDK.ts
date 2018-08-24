@@ -1,8 +1,8 @@
 import BufferModule = require('buffer');
 
 let Buffer = BufferModule.Buffer,
-    EthJS,
-    privateKeyGenerator,
+    EthJS = window['EthJS'] ? window['EthJS'].Util : undefined,
+    privateKeyGenerator = window['ethers'] ? window['ethers'] : undefined,
     nameKeysField = 'Wallets',
     nameUserField = 'user';
 
@@ -11,7 +11,10 @@ let Buffer = BufferModule.Buffer,
  * */
 export class Sp8deClientSDK {
 
-    constructor(eth?, privateKeyGeneratorExternal?) {
+    constructor() {
+    }
+
+    public init(eth?, privateKeyGeneratorExternal?): void {
         EthJS = !eth ? window['EthJS'].Util : eth;
         privateKeyGenerator = !privateKeyGeneratorExternal ? window['ethers'] : privateKeyGeneratorExternal;
     }
@@ -31,7 +34,6 @@ export class Sp8deClientSDK {
      * @return {object} Object contains wallet
      * */
     public generateWallet(): Wallet {
-        // console.log(privateKeyGenerator.Wallet.createRandom())
         return privateKeyGenerator.Wallet.createRandom();
     };
 
@@ -65,7 +67,7 @@ export class Sp8deClientSDK {
      * */
     public getPubKey(privateKey: string): string {
         if (!privateKey) {
-            throw new Error('Invalid parameter');
+            throw new Error('getPubKey: Invalid parameter');
         }
         return EthJS.addHexPrefix(EthJS.privateToAddress(privateKey).toString('hex'))
     };
@@ -83,7 +85,7 @@ export class Sp8deClientSDK {
             !Array.isArray(parameters.array) ||
             parameters.min === undefined ||
             parameters.max === undefined) {
-            throw new Error('Invalid parameters');
+            throw new Error('getRandomFromArray: Invalid parameters');
         }
         rand.init_by_array(parameters.array, parameters.array.length);
         for (let i = 0; i < parameters.count; i++) {
@@ -113,7 +115,7 @@ export class Sp8deClientSDK {
         if (parameters.privateKey === undefined ||
             parameters.seed === undefined ||
             parameters.nonce === undefined) {
-            throw new Error('Invalid parameters');
+            throw new Error('signMessage: Invalid parameters');
         }
         let pubKey = this.getPubKey(parameters.privateKey),
             message = `${pubKey};${parameters.seed};${parameters.nonce}`,
@@ -139,7 +141,6 @@ export class Sp8deClientSDK {
             parameters.sign[64] = parameters.sign[64] === 0 || parameters.sign[64] === 1 ? parameters.sign[64] + 27 : parameters.sign[64];
             msg = `${parameters.pubKey.toLowerCase()};${parameters.seed};${parameters.nonce}`;
             hash = EthJS.hashPersonalMessage(EthJS.toBuffer(msg));
-
             newPubKey = EthJS.ecrecover(
                 hash,
                 parameters.sign[64],
@@ -150,8 +151,8 @@ export class Sp8deClientSDK {
                 throw new TypeError('parameters.sign is not valid');
             }
         } catch (e) {
-            if (e instanceof SyntaxError) console.error('JSON is not valid');
-            else console.error(e);
+            if (e instanceof SyntaxError) console.error('validateSign: JSON is not valid');
+            else console.error('validateSign:', e);
             return false;
         }
         return true;
@@ -163,22 +164,30 @@ export class Sp8deClientSDK {
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @param storageService {object} optional. Object work with any storage
      */
-    public addWalletToStorage(value: WalletEncrypt,
-                              storageWallets: WalletEncrypt[] | User = this.getWalletsInStorage(),
-                              storageService = LocalStorageMethods): void {
-        if (!value) throw new Error('invalid value');
-        if (Array.isArray(storageWallets)) {
-            storageWallets.push(value);
-            storageService.setItem(nameKeysField, storageWallets);
-        } else if (storageWallets) {
-            if (!storageWallets[nameKeysField]) {
-                storageWallets[nameKeysField] = [];
-            }
-            storageWallets[nameKeysField].push(value);
-            storageService.setItem(nameUserField, storageWallets);
-        } else {
-            storageService.setItem(nameKeysField, [value]);
-        }
+    public addWalletToStorage(value: WalletEncrypt, storageWallets: any = this.getWalletsInStorage()): void {
+        if (!value) throw new Error('addWalletToStorage: invalid value');
+        this.isUser(storageWallets) ? this.addWalletToUser(value, storageWallets) : this.addWalletToWallets(value, storageWallets);
+    }
+
+    private addWalletToWallets(value: WalletEncrypt,
+                               storageWallets: WalletEncrypt[],
+                               storageService = LocalStorageMethods): void {
+        storageWallets = this.addWalletToArray(value, storageWallets);
+        storageService.setItem(nameKeysField, storageWallets);
+    }
+
+    private addWalletToUser(value: WalletEncrypt,
+                            storageWallets: User,
+                            storageService = LocalStorageMethods): void {
+        storageWallets[nameKeysField] = this.addWalletToArray(
+            value,
+            storageWallets && nameKeysField in storageWallets ? storageWallets[nameKeysField] : []
+        );
+        storageService.setItem(nameUserField, storageWallets);
+    }
+
+    private addWalletToArray(value: WalletEncrypt, storageWallets?: WalletEncrypt[]): WalletEncrypt[] {
+        return storageWallets ? [...storageWallets, value] : [value];
     }
 
     /**
@@ -186,17 +195,26 @@ export class Sp8deClientSDK {
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @param storageService {object} optional. Object work with any storage
      */
-    removeLastWalletFromStorage(
-        storageWallets: WalletEncrypt[] | User = this.getWalletsInStorage(),
-        storageService = LocalStorageMethods): void {
+    public removeLastWalletFromStorage(storageWallets: any = this.getWalletsInStorage()): void {
         if (!this.isWalletsInStorage(storageWallets)) return;
-        if (Array.isArray(storageWallets)) {
-            storageWallets.pop();
-            storageService.setItem(nameKeysField, storageWallets);
-        } else {
-            storageWallets[nameKeysField].pop();
-            storageService.setItem(nameUserField, storageWallets);
-        }
+        this.isUser(storageWallets) ? this.removeWalletFromUser(storageWallets) : this.removeWalletFromWallets(storageWallets);
+    }
+
+    private isUser(storageWallets: WalletEncrypt[] | User): boolean {
+        return storageWallets ? !Array.isArray(storageWallets) : false;
+    }
+
+    private removeWalletFromWallets(storageWallets: WalletEncrypt[]): void {
+        this.removeLastItemAndStore(storageWallets, nameKeysField);
+    }
+
+    private removeWalletFromUser(storageWallets: User): void {
+        this.removeLastItemAndStore(storageWallets[nameKeysField], nameUserField, storageWallets);
+    }
+
+    private removeLastItemAndStore(storage: any[], name: string, storageWallets: WalletEncrypt[] | User | any[] = storage, storageService = LocalStorageMethods): void {
+        storage.pop();
+        storageService.setItem(name, storageWallets);
     }
 
     /**
@@ -204,15 +222,17 @@ export class Sp8deClientSDK {
      * @param storageWallets {object | array} Object wallet contained in storage)
      * @param storageService {object} Object work with any storage
      */
-    public clearWalletStorage(
-        storageWallets: WalletEncrypt[] | User = this.getWalletsInStorage(),
-        storageService = LocalStorageMethods): void {
-        if (Array.isArray(storageWallets)) {
-            storageService.removeItem(nameKeysField);
-        } else {
-            delete storageWallets[nameKeysField];
-            storageService.setItem(nameUserField, storageWallets);
-        }
+    public clearWalletStorage(storageWallets: WalletEncrypt[] | User = this.getWalletsInStorage()): void {
+        this.isUser(storageWallets) ? this.clearStorageFromUser(storageWallets) : this.clearStorageFromWallets();
+    }
+
+    private clearStorageFromWallets(storageService = LocalStorageMethods): void {
+        storageService.setItem(nameKeysField, []);
+    }
+
+    private clearStorageFromUser(storageWallets: WalletEncrypt[] | User, storageService = LocalStorageMethods): void {
+        storageWallets[nameKeysField] = [];
+        storageService.setItem(nameUserField, storageWallets);
     }
 
     /**
@@ -229,13 +249,17 @@ export class Sp8deClientSDK {
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @return {string[]} Array of private keys or null if no array
      */
-    public getWalletsListFromStorage(storageWallets: WalletEncrypt[] | User = this.getWalletsInStorage()): WalletEncrypt[] {
+    public getWalletsListFromStorage(storageWallets: any = this.getWalletsInStorage()): WalletEncrypt[] {
         if (!this.isWalletsInStorage(storageWallets)) return null;
-        if (Array.isArray(storageWallets)) {
-            return storageWallets;
-        } else if (storageWallets) {
-            return storageWallets[nameKeysField];
-        } else return null;
+        return this.isUser(storageWallets) ? this.getListFromUser(storageWallets) : this.getListFromWallets(storageWallets);
+    }
+
+    private getListFromWallets(storageWallets: WalletEncrypt[]): WalletEncrypt[] {
+        return storageWallets;
+    }
+
+    private getListFromUser(storageWallets: User): WalletEncrypt[] {
+        return storageWallets[nameKeysField] ? storageWallets[nameKeysField] : null;
     }
 
     /**
@@ -243,20 +267,23 @@ export class Sp8deClientSDK {
      * @return {boolean} True if there is, false is not
      * @param storageWallets {object}  optional. User in storage, if it there is
      */
-    public isWalletsInStorage(storageWallets: WalletEncrypt[] | User = this.getWalletsInStorage()): boolean {
+    public isWalletsInStorage(storageWallets: any = this.getWalletsInStorage()): boolean {
         if (!storageWallets) return false;
-        if (Array.isArray(storageWallets)) {
-            if (!!!storageWallets.length) return false;
-        } else {
-            if (!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length) return false;
-        }
-        return true;
+        return this.isUser(storageWallets) ? this.isWalletsInUser(storageWallets) : this.isWalletsInWallets(storageWallets);
+    }
+
+    private isWalletsInWallets(storageWallets: WalletEncrypt[]): boolean {
+        return !!storageWallets.length;
+    }
+
+    private isWalletsInUser(storageWallets: WalletEncrypt[]): boolean {
+        return !(!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length);
     }
 
     private getWalletsInStorage(storageService = LocalStorageMethods): WalletEncrypt[] | User {
         const userKeys = storageService.getItem(nameUserField),
-            Wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
-        return userKeys ? userKeys : Wallets;
+            wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
+        return userKeys ? userKeys : wallets;
     }
 
     getTrezorHash(msg) {
@@ -277,23 +304,24 @@ export class Sp8deClientSDK {
 * */
 class LocalStorageMethods {
     static setItem(key: string, value: any): void {
-        if (!localStorage) throw new Error('Does not localstorage in global');
-        localStorage.setItem(key, JSON.stringify(value));
+        this.isLocalStorage() ? localStorage.setItem(key, JSON.stringify(value)) : null;
     }
 
     static getItem(key: string): any {
-        if (!localStorage) throw new Error('Does not localstorage in global');
-        return JSON.parse(localStorage.getItem(key));
+        return this.isLocalStorage() ? JSON.parse(localStorage.getItem(key)) : null;
     }
 
     static removeItem(key: string): void {
-        if (!localStorage) throw new Error('Does not localstorage in global');
-        localStorage.removeItem(key);
+        this.isLocalStorage() ? localStorage.removeItem(key) : null;
     }
 
     static clear(): void {
-        if (!localStorage) throw new Error('Does not localstorage in global');
-        localStorage.clear();
+        this.isLocalStorage() ? localStorage.clear() : null;
+    }
+
+    static isLocalStorage(): boolean {
+        if (localStorage) return true;
+        else throw new Error('Does not localstorage in global');
     }
 }
 
@@ -327,7 +355,7 @@ interface RandomFromArrayParameters {
 
 interface Wallet {
     address: string;
-    defaultGasLimit: 1500000;
+    defaultGasLimit: number;
     mnemonic: string;
     path: string;
     privateKey: string;

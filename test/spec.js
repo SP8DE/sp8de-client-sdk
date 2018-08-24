@@ -110,6 +110,15 @@ describe('Test library', function () {
                 nonce: 1
             })).toBe(true);
         });
+        it("Should be Validate signed message 2", function () {
+            let nonce = '636706264009882196';
+            expect(sp8de.validateSign({
+                sign: '0x8d4e5ad58bdcfd38a17c6cb64f0186e0f1df79eb24791191f19a5e0097f7cb017643c09166f467adf177afbca74d2b94f246f718a50ba8e9131fab02262bb2e11b',
+                pubKey: '0x492d0fd814940d1375225a7e10905585b72b0a8c',
+                seed: '-3346769847729876904',
+                nonce: '636706264009882196'
+            })).toBe(true);
+        });
         it("Should be Validate incorrect message", function () {
             expect(sp8de.validateSign({
                 sign: '0x70613377916f67008e948aec77ac2aa846833d01049fc270a5fb2e0974bd3a2455947d8e5684d745e5e1b9c36f65a30d444fbba5009e0ccdeb4621413b03d8f31b',
@@ -158,6 +167,43 @@ describe('Test library', function () {
                 expect(JSON.parse(localStorage.getItem('user')).Wallets.pop()).toEqual(key);
                 localStorage.clear();
             });
+            it("addWalletToWallets() should be add private key to wallets", function () {
+                let key = '1234';
+                sp8de.addWalletToWallets(key);
+                expect(JSON.parse(localStorage.getItem(nameField)).pop()).toEqual(key);
+                localStorage.clear();
+            });
+            it("addWalletToUser() should be add private key to user", function () {
+                let user = {name: 'name', Wallets: []},
+                    key = '1234';
+                localStorage.setItem('user', JSON.stringify(user));
+                sp8de.addWalletToUser(key, user);
+                expect(JSON.parse(localStorage.getItem('user')).Wallets.pop()).toEqual(key);
+                localStorage.clear();
+            });
+            it("addWalletToWallets() should be add private key to wallets with empty wallets", function () {
+                let key = '1234';
+                sp8de.addWalletToWallets(key);
+                expect(JSON.parse(localStorage.getItem(nameField)).pop()).toEqual(key);
+                localStorage.clear();
+            });
+            it("addWalletToUser() should be add private key to user with empty wallets", function () {
+                let user = {name: 'name', Wallets: []},
+                    key = '1234';
+                localStorage.setItem('user', JSON.stringify(user));
+                sp8de.addWalletToUser(key, user);
+                expect(JSON.parse(localStorage.getItem('user')).Wallets.pop()).toEqual(key);
+                localStorage.clear();
+            });
+            it("addWalletToArray() should be return array with add value", function () {
+                let key = '1234',
+                    array = [1, 2, 3];
+                array = sp8de.addWalletToArray(key, array);
+                expect(array.pop()).toBe(key);
+                array = sp8de.addWalletToArray(key);
+                expect(array).toEqual([key]);
+                expect(array.pop()).toBe(key);
+            });
         });
         describe("Remove", function () {
             it("removeLastWalletFromStorage method to be defined", function () {
@@ -175,16 +221,30 @@ describe('Test library', function () {
                 expect(JSON.parse(localStorage.getItem(nameField)).pop()).toEqual(keyFirst);
                 localStorage.clear();
             });
-            it("clearWalletStorage() should be remove all array of private keys", function () {
+            it("clearWalletStorage() should be clear all array of private keys", function () {
                 let keyFirst = '1234',
                     keySecond = '4321',
                     user = {name: 'name', Wallets: [1, 2, 3, 4]};
                 sp8de.addWalletToStorage(keyFirst);
                 sp8de.clearWalletStorage();
-                expect(JSON.parse(localStorage.getItem(nameField))).toBeNull();
+                expect(JSON.parse(localStorage.getItem(nameField))).toEqual([]);
                 localStorage.setItem('user', JSON.stringify(user));
                 sp8de.clearWalletStorage();
-                expect(JSON.parse(localStorage.getItem('user')).Wallets).toBeUndefined();
+                expect(JSON.parse(localStorage.getItem('user')).Wallets).toEqual([]);
+                localStorage.clear();
+            });
+            it("clearStorageFromUser() should be clear all array of private keys in user object", function () {
+                let user = {name: 'name', Wallets: [1, 2, 3, 4]};
+                localStorage.setItem('user', JSON.stringify(user));
+                sp8de.clearWalletStorage();
+                expect(JSON.parse(localStorage.getItem('user')).Wallets).toEqual([]);
+                localStorage.clear();
+            });
+            it("clearStorageFromWallets() should be remove all array of wallets", function () {
+                let keyFirst = '1234';
+                sp8de.addWalletToStorage(keyFirst);
+                sp8de.clearWalletStorage();
+                expect(JSON.parse(localStorage.getItem(nameField))).toEqual([]);
                 localStorage.clear();
             });
             it("removeLastWalletFromStorage() should be return if Wallets empty or undefined", function () {
@@ -211,6 +271,16 @@ describe('Test library', function () {
                 expect(JSON.parse(localStorage.getItem('user')).Wallets.pop()).toEqual(keyFirst);
                 localStorage.clear();
             });
+            it("removeLastItemAndStore should be remove last item from array and store to the storage", () => {
+                let arr = [1, 2, 3];
+                sp8de.removeLastItemAndStore(arr, 'test', arr);
+                expect(JSON.parse(localStorage.getItem('test'))).toEqual(arr);
+                localStorage.clear();
+                let arr2 = [1, 2, 3];
+                sp8de.removeLastItemAndStore(arr2, 'test');
+                expect(JSON.parse(localStorage.getItem('test'))).toEqual(arr2);
+                localStorage.clear();
+            })
         });
         describe("Get", function () {
             it("getActiveWalletFromStorage method to be defined", function () {
@@ -255,6 +325,15 @@ describe('Test library', function () {
                 }
                 expect(sp8de.getWalletsListFromStorage()).toEqual(keys);
                 localStorage.clear();
+            });
+            it("getListFromWallets() should return wallets from parameters", function () {
+                let wallets = ['1234', '4321', '5678', '8765'];
+                expect(sp8de.getListFromWallets(wallets)).toBe(wallets);
+            });
+            it("getListFromUser() should return wallets from parameters user", function () {
+                let wallets = ['1234', '4321', '5678', '8765'],
+                    user = {name: 'name', Wallets: wallets};
+                expect(sp8de.getListFromUser(user)).toBe(wallets);
             });
             it("getWalletsListFromStorage() should be return null if array empty or remove", function () {
                 expect(sp8de.getWalletsListFromStorage()).toBeNull();
