@@ -1,8 +1,13 @@
 import BufferModule = require('buffer');
+import innerEthJs = require('ethereumjs-util');
+import innerEthers = require('ethers');
+import R = require('Ramda');
 
 let Buffer = BufferModule.Buffer,
     EthJS = window['EthJS'] ? window['EthJS'].Util : undefined,
     privateKeyGenerator = window['ethers'] ? window['ethers'] : undefined,
+    externalEthJS = window['EthJS'],
+    externalEthers = window['ethers'],
     nameKeysField = 'Wallets',
     nameUserField = 'user';
 
@@ -14,9 +19,35 @@ export class Sp8deClientSDK {
     constructor() {
     }
 
-    public init(eth?, privateKeyGeneratorExternal?): void {
+    public init(paramEth?, paramPrivateKeyGenerator?): void {
+        /*let externalEthJS=window['EthJS'],
+            innerEthJs=eth,
+            externalEthers=window['EthJS'],
+            innerEthers=eth;*/
+        /*if(externalEthJS){
+            EthJS=externalEthers.Util;
+        }else{
+            if(innerEthJs){}
+        }
+*/
+        EthJS = !paramEth ?
+            externalEthJS ? externalEthJS.Util : innerEthJs
+            : paramEth;
+        privateKeyGenerator = !paramPrivateKeyGenerator ?
+            externalEthers ? externalEthers : innerEthers
+            : paramPrivateKeyGenerator;
+
+        /*privateKeyGenerator=externalEthers? externalEthers :
+            privateKeyGeneratorExternal? privateKeyGeneratorExternal : innerEthers;
+
+        EthJS=externalEthJS? externalEthJS.Util :
+            eth? eth : innerEthJs;
+        privateKeyGenerator=externalEthers? externalEthers :
+            privateKeyGeneratorExternal? privateKeyGeneratorExternal : innerEthers;
+
+
         EthJS = !eth ? window['EthJS'].Util : eth;
-        privateKeyGenerator = !privateKeyGeneratorExternal ? window['ethers'] : privateKeyGeneratorExternal;
+        privateKeyGenerator = !privateKeyGeneratorExternal ? window['ethers'] : privateKeyGeneratorExternal;*/
     }
 
     /**
