@@ -189,15 +189,29 @@ export class Sp8deClientSDK {
         return true;
     };
 
+    /*
+    *
+    * Functions for work with localstorage
+    *
+    * */
+
+    private isUser(storageWallets: WalletEncrypt[] | User): boolean {
+        return storageWallets ? !Array.isArray(storageWallets) : false;
+    }
+
     /**
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @param storageService {object} optional. Object work with any storage
      */
-    public addWalletToStorage(value: WalletEncrypt, storageWallets: any = this.getWalletsInStorage()): void {
+
+    public addWalletToStorage(value: WalletEncrypt,
+                              storageWallets: any = this.getWalletsInStorage()): void {
         if (!value) throw new Error('addWalletToStorage: invalid value');
-        this.isUser(storageWallets) ? this.addWalletToUser(value, storageWallets) : this.addWalletToWallets(value, storageWallets);
+        this.isUser(storageWallets) ?
+            this.addWalletToUser(value, storageWallets) :
+            this.addWalletToWallets(value, storageWallets);
     }
 
     private addWalletToWallets(value: WalletEncrypt,
@@ -210,10 +224,7 @@ export class Sp8deClientSDK {
     private addWalletToUser(value: WalletEncrypt,
                             storageWallets: User,
                             storageService = LocalStorageMethods): void {
-        storageWallets[nameKeysField] = this.addWalletToArray(
-            value,
-            storageWallets && nameKeysField in storageWallets ? storageWallets[nameKeysField] : []
-        );
+        storageWallets[nameKeysField] = this.addWalletToArray(value, this.isWalletsInUser(storageWallets) ? storageWallets[nameKeysField] : []);
         storageService.setItem(nameUserField, storageWallets);
     }
 
@@ -224,15 +235,10 @@ export class Sp8deClientSDK {
     /**
      * @description Removing last private key from array in localstorage
      * @param storageWallets {object | array} optional. Object wallet contained in storage
-     * @param storageService {object} optional. Object work with any storage
      */
     public removeLastWalletFromStorage(storageWallets: any = this.getWalletsInStorage()): void {
         if (!this.isWalletsInStorage(storageWallets)) return;
         this.isUser(storageWallets) ? this.removeWalletFromUser(storageWallets) : this.removeWalletFromWallets(storageWallets);
-    }
-
-    private isUser(storageWallets: WalletEncrypt[] | User): boolean {
-        return storageWallets ? !Array.isArray(storageWallets) : false;
     }
 
     private removeWalletFromWallets(storageWallets: WalletEncrypt[]): void {
@@ -251,7 +257,6 @@ export class Sp8deClientSDK {
     /**
      * @description Clear array of private keys (delete key from localstorage
      * @param storageWallets {object | array} Object wallet contained in storage)
-     * @param storageService {object} Object work with any storage
      */
     public clearWalletStorage(storageWallets: WalletEncrypt[] | User = this.getWalletsInStorage()): void {
         this.isUser(storageWallets) ? this.clearStorageFromUser(storageWallets) : this.clearStorageFromWallets();
@@ -307,7 +312,7 @@ export class Sp8deClientSDK {
         return !!storageWallets.length;
     }
 
-    private isWalletsInUser(storageWallets: WalletEncrypt[]): boolean {
+    private isWalletsInUser(storageWallets: User): boolean {
         return !(!storageWallets[nameKeysField] || !!!storageWallets[nameKeysField].length);
     }
 
