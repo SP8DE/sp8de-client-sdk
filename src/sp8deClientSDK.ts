@@ -303,16 +303,6 @@ export class Sp8deClientSDK {
             wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
         return userKeys ? userKeys : wallets;
     }
-
-    getTrezorHash(msg) {
-        return EthJS.sha3(
-            Buffer.concat([
-                EthJS.toBuffer('\u0019Ethereum Signed Message:\n'),
-                AccessoryFunctions.getTrezorLenBuf(msg.length),
-                EthJS.toBuffer(msg)
-            ])
-        );
-    };
 }
 
 /*
