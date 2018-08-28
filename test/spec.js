@@ -173,18 +173,18 @@ describe('Test library', function () {
                 expect(JSON.parse(localStorage.getItem(nameField)).pop()).toEqual(key);
                 localStorage.clear();
             });
+            it("addWalletToWallets() should be add private key to wallets with empty wallets", function () {
+                let key = '1234';
+                sp8de.addWalletToWallets(key);
+                expect(JSON.parse(localStorage.getItem(nameField)).pop()).toEqual(key);
+                localStorage.clear();
+            });
             it("addWalletToUser() should be add private key to user", function () {
                 let user = {name: 'name', Wallets: []},
                     key = '1234';
                 localStorage.setItem('user', JSON.stringify(user));
                 sp8de.addWalletToUser(key, user);
                 expect(JSON.parse(localStorage.getItem('user')).Wallets.pop()).toEqual(key);
-                localStorage.clear();
-            });
-            it("addWalletToWallets() should be add private key to wallets with empty wallets", function () {
-                let key = '1234';
-                sp8de.addWalletToWallets(key);
-                expect(JSON.parse(localStorage.getItem(nameField)).pop()).toEqual(key);
                 localStorage.clear();
             });
             it("addWalletToUser() should be add private key to user with empty wallets", function () {
@@ -396,7 +396,7 @@ describe('Test library', function () {
                 expect(sp8de.getWalletsInStorage()).toBeNull();
             });
         });
-        describe("Crypt and save", function () {
+        xdescribe("Crypt and save", function () {
             it("Should be create, encrypt, add to storage, get from storage and decrypt wallet", function (done) {
                 let wallet = sp8de.generateWallet(),
                     storageWallet,
@@ -415,7 +415,7 @@ describe('Test library', function () {
             });
         });
     })
-    describe("Wallet", function () {
+    xdescribe("Wallet", function () {
         describe("Creating", function () {
             it("generateWallet method to be defined", function () {
                 expect(sp8de.generateWallet).toBeDefined();
