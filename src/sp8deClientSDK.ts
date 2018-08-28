@@ -1,15 +1,23 @@
 import BufferModule = require('buffer');
-import innerEthJs = require('ethereumjs-util');
-import innerEthers = require('ethers');
-import R = require('Ramda');
 
-let Buffer = BufferModule.Buffer,
-    EthJS = window['EthJS'] ? window['EthJS'].Util : undefined,
-    privateKeyGenerator = window['ethers'] ? window['ethers'] : undefined,
-    externalEthJS = window['EthJS'],
-    externalEthers = window['ethers'],
+declare function require(moduleName: string): any;
+
+let EthJS, privateKeyGenerator, Buffer = BufferModule.Buffer,
     nameKeysField = 'Wallets',
     nameUserField = 'user';
+
+if (window['EthJS'] && window['ethers']) {
+    let externalEthJS = window['EthJS'],
+        externalEthers = window['ethers'];
+    EthJS = externalEthJS.Util;
+    privateKeyGenerator = externalEthers;
+
+} else {
+    let innerEthJs = require('ethereumjs-util'),
+        innerEthers = require('ethers');
+    EthJS = innerEthJs;
+    privateKeyGenerator = innerEthers;
+}
 
 /**
  * @class Sp8deClientSDK
@@ -20,34 +28,8 @@ export class Sp8deClientSDK {
     }
 
     public init(paramEth?, paramPrivateKeyGenerator?): void {
-        /*let externalEthJS=window['EthJS'],
-            innerEthJs=eth,
-            externalEthers=window['EthJS'],
-            innerEthers=eth;*/
-        /*if(externalEthJS){
-            EthJS=externalEthers.Util;
-        }else{
-            if(innerEthJs){}
-        }
-*/
-        EthJS = !paramEth ?
-            externalEthJS ? externalEthJS.Util : innerEthJs
-            : paramEth;
-        privateKeyGenerator = !paramPrivateKeyGenerator ?
-            externalEthers ? externalEthers : innerEthers
-            : paramPrivateKeyGenerator;
-
-        /*privateKeyGenerator=externalEthers? externalEthers :
-            privateKeyGeneratorExternal? privateKeyGeneratorExternal : innerEthers;
-
-        EthJS=externalEthJS? externalEthJS.Util :
-            eth? eth : innerEthJs;
-        privateKeyGenerator=externalEthers? externalEthers :
-            privateKeyGeneratorExternal? privateKeyGeneratorExternal : innerEthers;
-
-
-        EthJS = !eth ? window['EthJS'].Util : eth;
-        privateKeyGenerator = !privateKeyGeneratorExternal ? window['ethers'] : privateKeyGeneratorExternal;*/
+        EthJS = !paramEth ? window['EthJS'].Util : paramEth;
+        privateKeyGenerator = !paramPrivateKeyGenerator ? window['ethers'] : paramPrivateKeyGenerator;
     }
 
     /**
