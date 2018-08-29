@@ -646,5 +646,7 @@ class mt19937 {
     }
 }
 
+if (window !== undefined) window['sp8deClientSDK'] = new Sp8deClientSDK();
+else global.sp8deClientSDK = new Sp8deClientSDK();
 
 
