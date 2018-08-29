@@ -104,7 +104,7 @@ export class Sp8deClientSDK {
         }
         rand.init_by_array(parameters.array, parameters.array.length);
         for (let i = 0; i < parameters.count; i++) {
-            result.push(AccessoryFunctions.getRandomIntInclusive(rand.random(), parameters.min, parameters.max))
+            result.push(AccessoryFunctions.getIntInclusive(rand.random(), parameters.min, parameters.max))
         }
         return result;
     };
@@ -465,7 +465,7 @@ class AccessoryFunctions {
         }
     };
 
-    static getRandomIntInclusive(rnd: number, min: number, max: number): number {
+    static getIntInclusive(rnd: number, min: number, max: number): number {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(rnd * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
