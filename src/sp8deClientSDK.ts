@@ -160,7 +160,7 @@ export class Sp8deClientSDK {
         return AccessoryFunctions.byteArrayToLong(
             Array.prototype.slice.call(
                 AccessoryFunctions.getRandomValues(
-                    new Uint32Array(1)
+                    new Uint8Array(7)
                 )
             )
         );
