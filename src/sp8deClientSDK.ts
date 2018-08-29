@@ -88,6 +88,53 @@ export class Sp8deClientSDK {
     };
 
     /**
+     * @description Returns an seed-array (use keccak-384 algorithm)
+     * @memberOf Sp8deClientSDK
+     * @param {string[]} signs - array of signs
+     * @return {number[]} An array containing random numbers
+     * */
+    public generateArraySeed(signs: string[]): number[] {
+        return this.generateArrayFromHash(this.getHash(signs.join(';')));
+    }
+
+    /**
+     * @description Returns an hash from string
+     * @memberOf Sp8deClientSDK
+     * @param {string[]} string
+     * @return {ArrayBuffer} An ArrayBuffer contains hash
+     * */
+    private getHash(string: string): ArrayBuffer {
+        return EthJS.keccak(string, '384');
+    }
+
+    private generateArrayFromHash(hash: ArrayBuffer): number[] {
+        return this.splitIntoPieces(hash, 4)
+            .map(this.toUint8)
+            .map(this.toUint32);
+    }
+
+    private splitIntoPieces(arr: any, count: number): any[] {
+        arr = Array.isArray(arr) ? arr : Array.prototype.slice.call(arr);
+        return arr
+            .map((item, i, arr) => {
+                let result = [];
+                for (let j = i; j < i + count; j++) {
+                    if (arr[j]) result.push(arr[j]);
+                }
+                return result;
+            })
+            .filter((item, i) => i % count === 0);
+    }
+
+    private toUint8(arr: number[]): ArrayBuffer {
+        return new Uint8Array(arr);
+    }
+
+    private toUint32(arr: any): number {
+        return (new DataView(arr.buffer, 0)).getUint32(0);
+    }
+
+    /**
      * @description Returns an array of random numbers from seed-array (use mt19937 algorithm)
      * @memberOf Sp8deClientSDK
      * @param {{array: array, min: number, max: number, count: number}} parameters - {array: [], min: number, max: number, count: number}
