@@ -19,6 +19,107 @@ describe('Test library', function () {
         });
     });
     describe("Getting random from array", function () {
+        it("Method splitIntoPieces() should be defined", function () {
+            expect(sp8de.splitIntoPieces).toBeDefined();
+        });
+        it("Method splitIntoPieces() should be return array splitting for count pieces", function () {
+            let _in = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                out = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]];
+            expect(sp8de.splitIntoPieces(_in, 2)).toEqual(out);
+            _in = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+            out = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]];
+            expect(sp8de.splitIntoPieces(_in, 3)).toEqual(out);
+            _in = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+            out = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]];
+            expect(sp8de.splitIntoPieces(_in, 3)).toEqual(out);
+            _in = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+            out = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]];
+            expect(sp8de.splitIntoPieces(_in, 4)).toEqual(out);
+            _in = [1, 2, 3];
+            out = [[1], [2], [3]];
+            expect(sp8de.splitIntoPieces(_in, 1)).toEqual(out);
+            _in = [];
+            out = [];
+            expect(sp8de.splitIntoPieces(_in, 3)).toEqual(out);
+        });
+        it("Method generateArraySeed() should be defined", function () {
+            expect(sp8de.generateArraySeed).toBeDefined();
+        });
+        it("Method generateArraySeed() should be return array", function () {
+            expect(Array.isArray(sp8de.generateArraySeed(['test', 'test', 'test']))).toBeTruthy();
+        });
+        it("Method generateArraySeed() should be return array of 12 random numbers", function () {
+            const seeds = [
+                    '1948679508',
+                    '-4721854150932553650',
+                    '3486951862276399275'
+                ],
+                arraySeeds = sp8de.generateArraySeed(seeds),
+                result = [
+                    1602747949, 2909659892, 2763519977, 521142622, 2230361066, 2077001076, 23919704, 2817432661, 286186190, 418311551, 2284273299, 3162727144
+                ];
+            expect(arraySeeds).toEqual(result);
+        });
+        it("Method toUint8() should be defined", function () {
+            expect(sp8de.toUint8).toBeDefined();
+        });
+        it("Method toUint8() should be return ArrayBuffer", function () {
+            const arrayBuffer = new Uint8Array([1, 2, 3, 4]);
+            expect(sp8de.toUint8([1, 2, 3, 4])).toEqual(arrayBuffer);
+        });
+        it("Method toUint32() should be defined", function () {
+            expect(sp8de.toUint32).toBeDefined();
+        });
+        it("Method toUint32() should be return ArrayBuffer", function () {
+            const arrayBuffer = new Uint8Array([72, 187, 184, 216]),
+                uint32 = 1220262104;
+            expect(sp8de.toUint32(arrayBuffer)).toBe(uint32);
+        });
+        it("Method toUint32() should be return ArrayBuffer", function () {
+            const arrayBuffer = new Uint8Array([240, 29, 111, 100]),
+                uint32 = 4028460900;
+            expect(sp8de.toUint32(arrayBuffer)).toBe(uint32);
+        });
+        it("Method generateArrayFromHash() should be defined", function () {
+            expect(sp8de.generateArrayFromHash).toBeDefined();
+        });
+        it("Method generateArrayFromHash() should be return array", function () {
+            expect(Array.isArray(sp8de.generateArrayFromHash([1, 2, 3, 4]))).toBeTruthy();
+        });
+        it("Method generateArrayFromHash() should be return seed array from hash", function () {
+            const Uint8 = [
+                    72, 187, 184, 216, 240, 29, 111, 100, 170, 218, 20, 233, 53, 185, 113, 20, 218, 216, 192, 195, 163, 68, 47, 229, 174, 175, 149, 231, 224, 82, 99, 109, 158, 16, 151, 228, 95, 231, 242, 143, 26, 117, 236, 146, 254, 223, 36, 3
+                ],
+                Uint32LittleEndian = [3635985224, 1685003760, 3910458026, 342997301, 3284195546, 3845080227, 3885346734, 1835225824, 3835105438, 2415060831, 2464970010, 52748286],
+                Uint32BigEndian = [1220262104, 4028460900, 2866418921, 901345556, 3671638211, 2739154917, 2930742759, 3763495789, 2651887588, 1609036431, 443935890, 4276036611];
+            expect(sp8de.generateArrayFromHash(Uint8)).toEqual(Uint32BigEndian);
+        });
+        it("Method generateArrayFromHash() should be return seed array from generated hash", function () {
+            const signs = [
+                    "1948679508",
+                    "4721854150932553650",
+                    "3486951862276399275"
+                ],
+                hash = sp8de.getHash(signs.join(';')),
+                Uint32BigEndian = [
+                    422709730, 3560842529, 4044257916, 650168960, 431175787, 361202436, 3456054972, 22364493, 1850781193, 4210683086, 4281363041, 4002243109
+                ];
+            expect(sp8de.generateArrayFromHash(hash)).toEqual(Uint32BigEndian);
+        });
+        it("Method getHash() should be defined", function () {
+            expect(sp8de.getHash).toBeDefined();
+        });
+        it("Method getHash() should be return object", function () {
+            expect(typeof sp8de.getHash('test')).toBe('object');
+        });
+        it("Method getHash() should be return hash for 3 signs", function () {
+            const seeds = [
+                '1948679508',
+                '-4721854150932553650',
+                '3486951862276399275'
+            ];
+            expect(sp8de.getHash(seeds.join(';')).toString('hex')).toBe("5f87fe2dad6de2f4a4b7f7e91f10015e84f09bea7bcc8574016cfc58a7ee9c55110edace18eeed7f88273e93bc8362e8");
+        });
         it("Method getRandomFromArray() should be defined", function () {
             expect(sp8de.getRandomFromArray).toBeDefined();
         });
