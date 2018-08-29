@@ -13,16 +13,17 @@
     "test": "karma start",
     "watch": "watchify cdn/script.js -o js/script.js -v",
     "toCDNmin": "browserify cdn/script.js | uglifyjs > js/script.js",
-    "toCDN": "browserify cdn/script.js > js/script.js",
-    "prepublishOnly": "browserify cdn/script.js | uglifyjs> js/script.js && npm run doc"
+    "tocdn": "browserify src/sp8deClientSDK.js > js/script.js",
+    "prepublishOnly": "browserify src/sp8deClientSDK.js | uglifyjs> js/script.js && npm run doc"
   },
   "presets": [
     "@babel/preset-env"
   ],
   "license": "ISC",
   "dependencies": {
-    "buffer": "^5.1.0",
-    "typescript": "^3.0.1"
+    "ethereumjs-util": "^5.2.0",
+    "ethers": "^3.0.26",
+    "buffer": "^5.1.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.0.0-beta.54",
@@ -52,7 +53,8 @@
     "uglify-es": "^3.3.9",
     "watchify": "^3.11.0",
     "jsdoc-to-markdown": "^4.0.1",
-    "jsdox": "^0.4.10"
+    "jsdox": "^0.4.10",
+    "typescript": "^3.0.1"
   },
   "files": [
     "src"

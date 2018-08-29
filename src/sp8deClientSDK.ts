@@ -29,11 +29,6 @@ export class Sp8deClientSDK {
     constructor() {
     }
 
-    public init(paramEth?, paramPrivateKeyGenerator?): void {
-        EthJS = !paramEth ? window['EthJS'].Util : paramEth;
-        privateKeyGenerator = !paramPrivateKeyGenerator ? window['ethers'] : paramPrivateKeyGenerator;
-    }
-
     /**
      * @description Returns a new private key
      * @memberOf Sp8deClientSDK
