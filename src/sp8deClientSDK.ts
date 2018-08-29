@@ -9,16 +9,12 @@ let EthJS, privateKeyGenerator, Buffer = BufferModule.Buffer,
     nameUserField = 'user';
 
 if (window['EthJS'] && window['ethers']) {
-    let externalEthJS = window['EthJS'],
-        externalEthers = window['ethers'];
-    EthJS = externalEthJS.Util;
-    privateKeyGenerator = externalEthers;
+    EthJS = window['EthJS'].Util;
+    privateKeyGenerator = window['ethers'];
 
 } else {
-    let innerEthJs = require('ethereumjs-util'),
-        innerEthers = require('ethers');
-    EthJS = innerEthJs;
-    privateKeyGenerator = innerEthers;
+    EthJS = require('ethereumjs-util');
+    privateKeyGenerator = require('ethers');
 }
 
 /**
@@ -233,7 +229,6 @@ export class Sp8deClientSDK {
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
      * @param storageWallets {object | array} optional. Object wallet contained in storage
-     * @param storageService {object} optional. Object work with any storage
      */
 
     public addWalletToStorage(value: WalletEncrypt,
@@ -574,7 +569,7 @@ class mt19937 {
         j = 0;
         k = (this.N > key_length ? this.N : key_length);
         for (; k; k--) {
-            let s = this.mt[i - 1] ^ (this.mt[i - 1] >>> 30)
+            let s = this.mt[i - 1] ^ (this.mt[i - 1] >>> 30);
             this.mt[i] = (this.mt[i] ^ (((((s & 0xffff0000) >>> 16) * 1664525) << 16) + ((s & 0x0000ffff) * 1664525))) + init_key[j] + j;
             /* non linear */
             this.mt[i] >>>= 0;
