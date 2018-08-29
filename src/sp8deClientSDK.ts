@@ -461,14 +461,13 @@ interface WalletEncrypt {
 */
 class AccessoryFunctions {
     static getRandomValues(buf: Uint8Array): ArrayBuffer {
-        let nodeCrypto = global.nodeCrypto ? global.nodeCrypto : undefined;
+        if (!global) var global;
+        let nodeCrypto = global && 'nodeCrypto' in global ? global.nodeCrypto : undefined;
         if (window.crypto && window.crypto.getRandomValues) {
             return window.crypto.getRandomValues(buf);
-        }
-        if (typeof window['msCrypto'] === 'object' && typeof window['msCrypto'].getRandomValues === 'function') {
+        } else if (typeof window['msCrypto'] === 'object' && typeof window['msCrypto'].getRandomValues === 'function') {
             return window['msCrypto'].getRandomValues(buf);
-        }
-        if (nodeCrypto && nodeCrypto.randomBytes) {
+        } else if (nodeCrypto && nodeCrypto.randomBytes) {
             if (!(buf instanceof Uint8Array)) {
                 throw new TypeError('expected Uint8Array');
             }
@@ -483,8 +482,7 @@ class AccessoryFunctions {
             let bytes = nodeCrypto.randomBytes(buf.length);
             buf.set(bytes);
             return buf;
-        }
-        else {
+        } else {
             throw new Error('No secure random number generator available.');
         }
     }
