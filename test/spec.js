@@ -106,6 +106,16 @@ describe('Test library', function () {
                 ];
             expect(sp8de.generateArrayFromHash(hash)).toEqual(Uint32BigEndian);
         });
+        it("Method generateArrayFromHash() should be return seed array from generated hash", function () {
+            const signs = [
+                    sp8de.generateSeed(),
+                    sp8de.generateSeed(),
+                    sp8de.generateSeed()
+                ],
+                hash = sp8de.getHash(signs.join(';'));
+            console.log(signs)
+            expect(sp8de.generateArrayFromHash(hash).length).toBe(12);
+        });
         it("Method getHash() should be defined", function () {
             expect(sp8de.getHash).toBeDefined();
         });
