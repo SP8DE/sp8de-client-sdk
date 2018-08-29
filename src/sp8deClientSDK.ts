@@ -2,6 +2,8 @@ import BufferModule = require('buffer');
 
 declare function require(moduleName: string): any;
 
+declare var global: any;
+
 let EthJS, privateKeyGenerator, Buffer = BufferModule.Buffer,
     nameKeysField = 'Wallets',
     nameUserField = 'user';
@@ -407,6 +409,43 @@ interface WalletEncrypt {
 *
 */
 class AccessoryFunctions {
+    static getRandomValues(buf: Uint8Array): ArrayBuffer {
+        let nodeCrypto = global.nodeCrypto ? global.nodeCrypto : undefined;
+        if (window.crypto && window.crypto.getRandomValues) {
+            return window.crypto.getRandomValues(buf);
+        }
+        if (typeof window['msCrypto'] === 'object' && typeof window['msCrypto'].getRandomValues === 'function') {
+            return window['msCrypto'].getRandomValues(buf);
+        }
+        if (nodeCrypto && nodeCrypto.randomBytes) {
+            if (!(buf instanceof Uint8Array)) {
+                throw new TypeError('expected Uint8Array');
+            }
+            if (buf.length > 65536) {
+                let e = new Error();
+                e.message = 'Failed to execute \'getRandomValues\' on \'Crypto\': The ' +
+                    'ArrayBufferView\'s byte length (' + buf.length + ') exceeds the ' +
+                    'number of bytes of entropy available via this API (65536).';
+                e.name = 'QuotaExceededError';
+                throw e;
+            }
+            let bytes = nodeCrypto.randomBytes(buf.length);
+            buf.set(bytes);
+            return buf;
+        }
+        else {
+            throw new Error('No secure random number generator available.');
+        }
+    }
+
+    static byteArrayToLong(byteArray: any[]): number {
+        let value = 0;
+        for (let i = byteArray.length - 1; i >= 0; i--) {
+            value = (value * 256) + byteArray[i];
+        }
+        return value;
+    };
+
     static getNakedAddress(address: string): string {
         return address.toLowerCase().replace('0x', '');
     };
