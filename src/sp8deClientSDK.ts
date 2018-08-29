@@ -115,9 +115,13 @@ export class Sp8deClientSDK {
      * @return {number} Random seed number. Length 9-10
      * */
     public generateSeed(): number {
-        let rnd = new Uint32Array(1);
-        window.crypto.getRandomValues(rnd);
-        return rnd[0];
+        return AccessoryFunctions.byteArrayToLong(
+            Array.prototype.slice.call(
+                AccessoryFunctions.getRandomValues(
+                    new Uint32Array(1)
+                )
+            )
+        );
     };
 
     /**
