@@ -477,7 +477,8 @@ class AccessoryFunctions {
             var bytes = wrapper['nodeCrypto'].randomBytes(buf.length);
             buf.set(bytes);
             return buf;
-        } else {
+        }
+        else {
             throw new Error('No secure random number generator available.');
         }
     }
