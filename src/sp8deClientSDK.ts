@@ -11,7 +11,6 @@ let EthJS, privateKeyGenerator, Buffer = BufferModule.Buffer,
 if (!global && window['EthJS'] && window['ethers']) {
     EthJS = window['EthJS'].Util;
     privateKeyGenerator = window['ethers'];
-
 } else {
     EthJS = require('ethereumjs-util');
     privateKeyGenerator = require('ethers');
