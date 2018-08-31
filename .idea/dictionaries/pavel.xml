@@ -9,12 +9,14 @@
       <w>genrand</w>
       <w>geth</w>
       <w>kdfparams</w>
+      <w>keccak</w>
       <w>keythereum</w>
       <w>localstorage</w>
       <w>makoto</w>
       <w>matsumoto</w>
       <w>taocp</w>
       <w>trezor</w>
+      <w>uint</w>
       <w>wordsize</w>
     </words>
   </dictionary>
