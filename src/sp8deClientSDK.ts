@@ -90,7 +90,7 @@ export class Sp8deClientSDK {
     /**
      * @description Returns an hash from string
      * @memberOf Sp8deClientSDK
-     * @param {string[]} string
+     * @param {string} string
      * @return {ArrayBuffer} An ArrayBuffer contains hash
      * */
     private getHash(string: string): ArrayBuffer {
