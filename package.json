@@ -1,6 +1,6 @@
 {
   "name": "sp8de-client-sdk",
-  "version": "1.4.24",
+  "version": "1.5.37",
   "description": "Sp8de crypto client SDK",
   "main": "src/sp8deClientSDK.js",
   "repository": {
@@ -14,7 +14,7 @@
     "ts": "tsc src/sp8deClientSDK.ts -w",
     "dev": "npm run test | npm run ts",
     "watch": "watchify cdn/script.js -o js/script.js -v",
-    "toCDNmin": "browserify cdn/script.js | uglifyjs > js/script.js",
+    "tocdnmin": "browserify cdn/script.js | uglifyjs > js/script.js",
     "tocdn": "browserify src/sp8deClientSDK.js > js/script.js",
     "prepublishOnly": "browserify src/sp8deClientSDK.js | uglifyjs> js/script.js && npm run doc"
   },
