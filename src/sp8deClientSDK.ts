@@ -450,13 +450,19 @@ interface WalletEncrypt {
 */
 class AccessoryFunctions {
     static getRandomValues(buf: Uint8Array): ArrayBuffer {
-        if (!global) var global;
-        let nodeCrypto = global && 'nodeCrypto' in global ? global.nodeCrypto : undefined;
-        if (window.crypto && window.crypto.getRandomValues) {
-            return window.crypto.getRandomValues(buf);
-        } else if (typeof window['msCrypto'] === 'object' && typeof window['msCrypto'].getRandomValues === 'function') {
-            return window['msCrypto'].getRandomValues(buf);
-        } else if (nodeCrypto && nodeCrypto.randomBytes) {
+        var wrapper;
+        if (typeof window !== 'undefined') {
+            wrapper = window;
+        } else if (typeof global !== 'undefined') {
+            wrapper = global;
+        }
+        if (wrapper['crypto'] && wrapper['crypto'].getRandomValues) {
+            return wrapper.crypto.getRandomValues(buf);
+        }
+        else if (typeof wrapper['msCrypto'] === 'object' && typeof wrapper['msCrypto'].getRandomValues === 'function') {
+            return wrapper['msCrypto'].getRandomValues(buf);
+        }
+        else if (wrapper['nodeCrypto'] && wrapper['nodeCrypto'].randomBytes) {
             if (!(buf instanceof Uint8Array)) {
                 throw new TypeError('expected Uint8Array');
             }
