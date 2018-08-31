@@ -467,14 +467,14 @@ class AccessoryFunctions {
                 throw new TypeError('expected Uint8Array');
             }
             if (buf.length > 65536) {
-                let e = new Error();
+                var e = new Error();
                 e.message = 'Failed to execute \'getRandomValues\' on \'Crypto\': The ' +
                     'ArrayBufferView\'s byte length (' + buf.length + ') exceeds the ' +
                     'number of bytes of entropy available via this API (65536).';
                 e.name = 'QuotaExceededError';
                 throw e;
             }
-            let bytes = nodeCrypto.randomBytes(buf.length);
+            var bytes = wrapper['nodeCrypto'].randomBytes(buf.length);
             buf.set(bytes);
             return buf;
         } else {
