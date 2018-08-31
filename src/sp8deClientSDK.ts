@@ -109,7 +109,7 @@ export class Sp8deClientSDK {
             .map((item, i, arr) => {
                 let result = [];
                 for (let j = i; j < i + count; j++) {
-                    if (arr[j]) result.push(arr[j]);
+                    if (arr[j] !== undefined) result.push(arr[j]);
                 }
                 return result;
             })
