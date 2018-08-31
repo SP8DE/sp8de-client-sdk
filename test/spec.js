@@ -124,7 +124,6 @@ describe('Test library', function () {
                     sp8de.generateSeed()
                 ],
                 hash = sp8de.getHash(signs.join(';'));
-            console.log(signs)
             expect(sp8de.generateArrayFromHash(hash).length).toBe(12);
         });
         it("Method getHash() should be defined", function () {
