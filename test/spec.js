@@ -60,6 +60,17 @@ describe('Test library', function () {
                 ];
             expect(arraySeeds).toEqual(result);
         });
+        it("Method generateArraySeed() should be work on different seeds", function () {
+            for (let i = 0; i < 10; i++) {
+                const seeds = [
+                    sp8de.generateSeed(),
+                    sp8de.generateSeed(),
+                    sp8de.generateSeed()
+                ];
+                const arraySeeds = sp8de.generateArraySeed(seeds);
+                expect(arraySeeds.length).toBe(12);
+            }
+        });
         it("Method toUint8() should be defined", function () {
             expect(sp8de.toUint8).toBeDefined();
         });
