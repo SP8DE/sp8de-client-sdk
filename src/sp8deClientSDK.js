@@ -1,17 +1,21 @@
 "use strict";
 exports.__esModule = true;
 var BufferModule = require("buffer");
-var Buffer = BufferModule.Buffer, EthJS = window['EthJS'] ? window['EthJS'].Util : undefined, privateKeyGenerator = window['ethers'] ? window['ethers'] : undefined, nameKeysField = 'Wallets', nameUserField = 'user';
+var EthJS, privateKeyGenerator, Buffer = BufferModule.Buffer, nameKeysField = 'Wallets', nameUserField = 'user';
+if (!global && window['EthJS'] && window['ethers']) {
+    EthJS = window['EthJS'].Util;
+    privateKeyGenerator = window['ethers'];
+}
+else {
+    EthJS = require('ethereumjs-util');
+    privateKeyGenerator = require('ethers');
+}
 /**
  * @class Sp8deClientSDK
  * */
 var Sp8deClientSDK = /** @class */ (function () {
     function Sp8deClientSDK() {
     }
-    Sp8deClientSDK.prototype.init = function (eth, privateKeyGeneratorExternal) {
-        EthJS = !eth ? window['EthJS'].Util : eth;
-        privateKeyGenerator = !privateKeyGeneratorExternal ? window['ethers'] : privateKeyGeneratorExternal;
-    };
     /**
      * @description Returns a new private key
      * @memberOf Sp8deClientSDK
@@ -66,6 +70,48 @@ var Sp8deClientSDK = /** @class */ (function () {
     };
     ;
     /**
+     * @description Returns an seed-array (use keccak-384 algorithm)
+     * @memberOf Sp8deClientSDK
+     * @param {string[]} signs - array of signs
+     * @return {number[]} An array containing random numbers
+     * */
+    Sp8deClientSDK.prototype.generateArraySeed = function (signs) {
+        return this.generateArrayFromHash(this.getHash(signs.join(';')));
+    };
+    /**
+     * @description Returns an hash from string
+     * @memberOf Sp8deClientSDK
+     * @param {string} string
+     * @return {ArrayBuffer} An ArrayBuffer contains hash
+     * */
+    Sp8deClientSDK.prototype.getHash = function (string) {
+        return EthJS.keccak(string, '384');
+    };
+    Sp8deClientSDK.prototype.generateArrayFromHash = function (hash) {
+        return this.splitIntoPieces(hash, 4)
+            .map(this.toUint8)
+            .map(this.toUint32);
+    };
+    Sp8deClientSDK.prototype.splitIntoPieces = function (arr, count) {
+        arr = Array.isArray(arr) ? arr : Array.prototype.slice.call(arr);
+        return arr
+            .map(function (item, i, arr) {
+            var result = [];
+            for (var j = i; j < i + count; j++) {
+                if (arr[j] !== undefined)
+                    result.push(arr[j]);
+            }
+            return result;
+        })
+            .filter(function (item, i) { return i % count === 0; });
+    };
+    Sp8deClientSDK.prototype.toUint8 = function (arr) {
+        return new Uint8Array(arr);
+    };
+    Sp8deClientSDK.prototype.toUint32 = function (arr) {
+        return (new DataView(arr.buffer, 0)).getUint32(0);
+    };
+    /**
      * @description Returns an array of random numbers from seed-array (use mt19937 algorithm)
      * @memberOf Sp8deClientSDK
      * @param {{array: array, min: number, max: number, count: number}} parameters - {array: [], min: number, max: number, count: number}
@@ -81,7 +127,7 @@ var Sp8deClientSDK = /** @class */ (function () {
         }
         rand.init_by_array(parameters.array, parameters.array.length);
         for (var i = 0; i < parameters.count; i++) {
-            result.push(AccessoryFunctions.getRandomIntInclusive(rand.random(), parameters.min, parameters.max));
+            result.push(AccessoryFunctions.getIntInclusive(rand.random(), parameters.min, parameters.max));
         }
         return result;
     };
@@ -92,9 +138,7 @@ var Sp8deClientSDK = /** @class */ (function () {
      * @return {number} Random seed number. Length 9-10
      * */
     Sp8deClientSDK.prototype.generateSeed = function () {
-        var rnd = new Uint32Array(1);
-        window.crypto.getRandomValues(rnd);
-        return rnd[0];
+        return AccessoryFunctions.byteArrayToLong(Array.prototype.slice.call(AccessoryFunctions.getRandomValues(new Uint8Array(7))));
     };
     ;
     /**
@@ -147,17 +191,26 @@ var Sp8deClientSDK = /** @class */ (function () {
         return true;
     };
     ;
+    /*
+    *
+    * Functions for work with localstorage
+    *
+    * */
+    Sp8deClientSDK.prototype.isUser = function (storageWallets) {
+        return storageWallets ? !Array.isArray(storageWallets) : false;
+    };
     /**
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
      * @param value {string} Private key
      * @param storageWallets {object | array} optional. Object wallet contained in storage
-     * @param storageService {object} optional. Object work with any storage
      */
     Sp8deClientSDK.prototype.addWalletToStorage = function (value, storageWallets) {
         if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
         if (!value)
             throw new Error('addWalletToStorage: invalid value');
-        this.isUser(storageWallets) ? this.addWalletToUser(value, storageWallets) : this.addWalletToWallets(value, storageWallets);
+        this.isUser(storageWallets) ?
+            this.addWalletToUser(value, storageWallets) :
+            this.addWalletToWallets(value, storageWallets);
     };
     Sp8deClientSDK.prototype.addWalletToWallets = function (value, storageWallets, storageService) {
         if (storageService === void 0) { storageService = LocalStorageMethods; }
@@ -166,7 +219,7 @@ var Sp8deClientSDK = /** @class */ (function () {
     };
     Sp8deClientSDK.prototype.addWalletToUser = function (value, storageWallets, storageService) {
         if (storageService === void 0) { storageService = LocalStorageMethods; }
-        storageWallets[nameKeysField] = this.addWalletToArray(value, storageWallets && nameKeysField in storageWallets ? storageWallets[nameKeysField] : []);
+        storageWallets[nameKeysField] = this.addWalletToArray(value, this.isWalletsInUser(storageWallets) ? storageWallets[nameKeysField] : []);
         storageService.setItem(nameUserField, storageWallets);
     };
     Sp8deClientSDK.prototype.addWalletToArray = function (value, storageWallets) {
@@ -175,16 +228,12 @@ var Sp8deClientSDK = /** @class */ (function () {
     /**
      * @description Removing last private key from array in localstorage
      * @param storageWallets {object | array} optional. Object wallet contained in storage
-     * @param storageService {object} optional. Object work with any storage
      */
     Sp8deClientSDK.prototype.removeLastWalletFromStorage = function (storageWallets) {
         if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
         if (!this.isWalletsInStorage(storageWallets))
             return;
         this.isUser(storageWallets) ? this.removeWalletFromUser(storageWallets) : this.removeWalletFromWallets(storageWallets);
-    };
-    Sp8deClientSDK.prototype.isUser = function (storageWallets) {
-        return storageWallets ? !Array.isArray(storageWallets) : false;
     };
     Sp8deClientSDK.prototype.removeWalletFromWallets = function (storageWallets) {
         this.removeLastItemAndStore(storageWallets, nameKeysField);
@@ -201,7 +250,6 @@ var Sp8deClientSDK = /** @class */ (function () {
     /**
      * @description Clear array of private keys (delete key from localstorage
      * @param storageWallets {object | array} Object wallet contained in storage)
-     * @param storageService {object} Object work with any storage
      */
     Sp8deClientSDK.prototype.clearWalletStorage = function (storageWallets) {
         if (storageWallets === void 0) { storageWallets = this.getWalletsInStorage(); }
@@ -264,14 +312,6 @@ var Sp8deClientSDK = /** @class */ (function () {
         var userKeys = storageService.getItem(nameUserField), wallets = storageService.getItem(nameKeysField) ? storageService.getItem(nameKeysField) : null;
         return userKeys ? userKeys : wallets;
     };
-    Sp8deClientSDK.prototype.getTrezorHash = function (msg) {
-        return EthJS.sha3(Buffer.concat([
-            EthJS.toBuffer('\u0019Ethereum Signed Message:\n'),
-            AccessoryFunctions.getTrezorLenBuf(msg.length),
-            EthJS.toBuffer(msg)
-        ]));
-    };
-    ;
     return Sp8deClientSDK;
 }());
 exports.Sp8deClientSDK = Sp8deClientSDK;
@@ -311,6 +351,48 @@ var LocalStorageMethods = /** @class */ (function () {
 var AccessoryFunctions = /** @class */ (function () {
     function AccessoryFunctions() {
     }
+    AccessoryFunctions.getRandomValues = function (buf) {
+        var wrapper;
+        if (typeof window !== 'undefined') {
+            wrapper = window;
+        }
+        else if (typeof global !== 'undefined') {
+            wrapper = global;
+        }
+        if (wrapper['crypto'] && wrapper['crypto'].getRandomValues) {
+            return wrapper.crypto.getRandomValues(buf);
+        }
+        else if (typeof wrapper['msCrypto'] === 'object' && typeof wrapper['msCrypto'].getRandomValues === 'function') {
+            return wrapper['msCrypto'].getRandomValues(buf);
+        }
+        else if (wrapper['nodeCrypto'] && wrapper['nodeCrypto'].randomBytes) {
+            if (!(buf instanceof Uint8Array)) {
+                throw new TypeError('expected Uint8Array');
+            }
+            if (buf.length > 65536) {
+                var e = new Error();
+                e.message = 'Failed to execute \'getRandomValues\' on \'Crypto\': The ' +
+                    'ArrayBufferView\'s byte length (' + buf.length + ') exceeds the ' +
+                    'number of bytes of entropy available via this API (65536).';
+                e.name = 'QuotaExceededError';
+                throw e;
+            }
+            var bytes = wrapper['nodeCrypto'].randomBytes(buf.length);
+            buf.set(bytes);
+            return buf;
+        }
+        else {
+            throw new Error('No secure random number generator available.');
+        }
+    };
+    AccessoryFunctions.byteArrayToLong = function (byteArray) {
+        var value = 0;
+        for (var i = byteArray.length - 1; i >= 0; i--) {
+            value = (value * 256) + byteArray[i];
+        }
+        return value;
+    };
+    ;
     AccessoryFunctions.getNakedAddress = function (address) {
         return address.toLowerCase().replace('0x', '');
     };
@@ -331,7 +413,7 @@ var AccessoryFunctions = /** @class */ (function () {
         }
     };
     ;
-    AccessoryFunctions.getRandomIntInclusive = function (rnd, min, max) {
+    AccessoryFunctions.getIntInclusive = function (rnd, min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(rnd * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
@@ -448,3 +530,7 @@ var mt19937 = /** @class */ (function () {
     };
     return mt19937;
 }());
+if (!global && window !== undefined)
+    window['sp8deClientSDK'] = new Sp8deClientSDK();
+else
+    global.sp8deClientSDK = new Sp8deClientSDK();
