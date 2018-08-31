@@ -253,12 +253,13 @@ describe('Test library', function () {
             let privateKey = sp8de.generatePrivateKey(),
                 pubKey = sp8de.getPubKey(privateKey),
                 seed = sp8de.generateSeed(),
-                sign = sp8de.signMessage({privateKey: privateKey, seed: seed, nonce: 1});
+                nonce = sp8de.generateSeed(),
+                sign = sp8de.signMessage({privateKey: privateKey, seed: seed, nonce: nonce});
             expect(sp8de.validateSign({
                 sign: sign,
                 pubKey: pubKey,
                 seed: seed,
-                nonce: 1
+                nonce: nonce
             })).toBe(true);
         });
     });
