@@ -2,7 +2,7 @@
 exports.__esModule = true;
 var BufferModule = require("buffer");
 var EthJS, privateKeyGenerator, Buffer = BufferModule.Buffer, nameKeysField = 'Wallets', nameUserField = 'user';
-if (!global && window['EthJS'] && window['ethers']) {
+if (typeof global === 'undefined' && window['EthJS'] && window['ethers']) {
     EthJS = window['EthJS'].Util;
     privateKeyGenerator = window['ethers'];
 }
@@ -530,7 +530,5 @@ var mt19937 = /** @class */ (function () {
     };
     return mt19937;
 }());
-if (!global && window !== undefined)
+if (typeof global === 'undefined' && typeof window !== 'undefined')
     window['sp8deClientSDK'] = new Sp8deClientSDK();
-else
-    global.sp8deClientSDK = new Sp8deClientSDK();
