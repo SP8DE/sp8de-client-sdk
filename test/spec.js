@@ -60,6 +60,44 @@ describe('Test library', function () {
                 ];
             expect(arraySeeds).toEqual(result);
         });
+        it("Method generateArraySeed() should be work on empty vals", function () {
+            const seeds = [
+                    '',
+                    '',
+                    ''
+                ],
+                arraySeeds = sp8de.generateArraySeed(seeds);
+            expect(arraySeeds.length).toBe(12);
+        });
+        it("Method generateArraySeed() should be work on nulls", function () {
+            const seeds = [
+                    '0',
+                    '0',
+                    '0'
+                ],
+                arraySeeds = sp8de.generateArraySeed(seeds);
+            expect(arraySeeds.length).toBe(12);
+        });
+        it("Method generateArraySeed() should be work on large string", function () {
+            const seeds = [
+                    'djfkasdfhlasdfybo87398w7d7nf978xn3e9ad9padsfae8fasfdouasoidfyas97cd9zuidfhasod87fya9sd7fasdfhalsdfy9asd7fa78sdfouyq3h94fwe8afp0an8pdfo',
+                    'djfkasdfhlasdfybo87398w7d7nf978xn3e9ad9padsfae8fasfdouasoidfyas97cd9zuidfhasod87fya9sd7fasdfhalsdfy9asd7fa78sdfouyq3h94fwe8afp0an8pdfo',
+                    'djfkasdfhlasdfybo87398w7d7nf978xn3e9ad9padsfae8fasfdouasoidfyas97cd9zuidfhasod87fya9sd7fasdfhalsdfy9asd7fa78sdfouyq3h94fwe8afp0an8pdfo'
+                ],
+                arraySeeds = sp8de.generateArraySeed(seeds);
+            console.log(arraySeeds)
+            expect(arraySeeds.length).toBe(12);
+        });
+        it("Method generateArraySeed() should be work on large number", function () {
+            const seeds = [
+                    '2131237609634971634971634869134673496912364816348632482374234273496273462634929416036491736481634538468723642347927349872349872934',
+                    '2131237609634971634971634869134673496912364816348632482374234273496273462634929416036491736481634538468723642347927349872349872934',
+                    '2131237609634971634971634869134673496912364816348632482374234273496273462634929416036491736481634538468723642347927349872349872934'
+                ],
+                arraySeeds = sp8de.generateArraySeed(seeds);
+            console.log(arraySeeds)
+            expect(arraySeeds.length).toBe(12);
+        });
         it("Method generateArraySeed() should be work on different seeds", function () {
             for (let i = 0; i < 10; i++) {
                 const seeds = [
