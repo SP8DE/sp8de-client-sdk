@@ -23,9 +23,10 @@
   ],
   "license": "ISC",
   "dependencies": {
+    "buffer": "^5.1.0",
     "ethereumjs-util": "^5.2.0",
     "ethers": "^3.0.26",
-    "buffer": "^5.1.0"
+    "stream": "0.0.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.0.0-beta.54",
