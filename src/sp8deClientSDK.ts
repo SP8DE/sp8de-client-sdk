@@ -46,7 +46,7 @@ export class Sp8deClientSDK {
      * @description Returns a new wallet
      * @memberOf Sp8deClientSDK
      * @param {object} wallet - object with wallet
-     * @param {string} password
+     * @param {string} password -password
      * @return {promise} promise with json
      * */
     public encryptWallet(wallet: Wallet, password: string): Promise<any> {
@@ -57,7 +57,7 @@ export class Sp8deClientSDK {
      * @description Returns a new wallet
      * @memberOf Sp8deClientSDK
      * @param {string}  wallet - Encrypted JSON with wallet
-     * @param {string} password
+     * @param {string} password - password
      * @return {promise} promise with json
      * */
     public decryptWallet(wallet: WalletEncrypt, password: string): Promise<any> {
@@ -97,6 +97,12 @@ export class Sp8deClientSDK {
         return EthJS.keccak(string, '384');
     }
 
+    /**
+     * @description Returns an array of Uint32 numbers from hash
+     * @memberOf Sp8deClientSDK
+     * @param {ArrayBuffer} hash
+     * @return {number[]} array of of Uint32 numbers
+     * */
     private generateArrayFromHash(hash: ArrayBuffer): number[] {
         return this.splitIntoPieces(hash, 4)
             .map(this.toUint8)
@@ -226,6 +232,7 @@ export class Sp8deClientSDK {
 
     /**
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
+     * @memberOf Sp8deClientSDK
      * @param value {string} Private key
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      */
@@ -258,6 +265,7 @@ export class Sp8deClientSDK {
 
     /**
      * @description Removing last private key from array in localstorage
+     * @memberOf Sp8deClientSDK
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      */
     public removeLastWalletFromStorage(storageWallets: any = this.getWalletsInStorage()): void {
@@ -280,6 +288,7 @@ export class Sp8deClientSDK {
 
     /**
      * @description Clear array of private keys (delete key from localstorage
+     * @memberOf Sp8deClientSDK
      * @param storageWallets {object | array} Object wallet contained in storage)
      */
     public clearWalletStorage(storageWallets: WalletEncrypt[] | User = this.getWalletsInStorage()): void {
@@ -297,6 +306,7 @@ export class Sp8deClientSDK {
 
     /**
      * @description Returns active private key in localstorage
+     * @memberOf Sp8deClientSDK
      * @returns {string} Active private key or null if no array
      * @param Wallets {array} optional. Array wallets contained in storage
      */
@@ -306,6 +316,7 @@ export class Sp8deClientSDK {
 
     /**
      * @description Returns array of string contains all private keys from localstorage
+     * @memberOf Sp8deClientSDK
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @return {string[]} Array of private keys or null if no array
      */
@@ -325,6 +336,7 @@ export class Sp8deClientSDK {
     /**
      * @description  Check if there are keys in vault
      * @return {boolean} True if there is, false is not
+     * @memberOf Sp8deClientSDK
      * @param storageWallets {object}  optional. User in storage, if it there is
      */
     public isWalletsInStorage(storageWallets: any = this.getWalletsInStorage()): boolean {

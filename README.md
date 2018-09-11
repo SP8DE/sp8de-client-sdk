@@ -1,6 +1,6 @@
-## Sp8de crypto client SDK
+## Sp8de crypto SDK
 
-SDK for client
+SDK for client and server
 
 ## Install
 
@@ -134,6 +134,9 @@ Validating random number from array-seed
     * [.encryptWallet(wallet, password)](#Sp8deClientSDK+encryptWallet) ⇒ <code>promise</code>
     * [.decryptWallet(wallet, password)](#Sp8deClientSDK+decryptWallet) ⇒ <code>promise</code>
     * [.getPubKey(privateKey)](#Sp8deClientSDK+getPubKey) ⇒ <code>string</code>
+    * [.generateArraySeed(signs)](#Sp8deClientSDK+generateArraySeed) ⇒ <code>Array.&lt;number&gt;</code>
+    * [.getHash(string)](#Sp8deClientSDK+getHash) ⇒ <code>ArrayBuffer</code>
+    * [.generateArrayFromHash(hash)](#Sp8deClientSDK+generateArrayFromHash) ⇒ <code>Array.&lt;number&gt;</code>
     * [.getRandomFromArray(parameters)](#Sp8deClientSDK+getRandomFromArray) ⇒ <code>Array.&lt;number&gt;</code>
     * [.generateSeed()](#Sp8deClientSDK+generateSeed) ⇒ <code>number</code>
     * [.signMessage(parameters)](#Sp8deClientSDK+signMessage) ⇒ <code>string</code>
@@ -141,27 +144,24 @@ Validating random number from array-seed
     * [.addWalletToStorage(value, storageWallets)](#Sp8deClientSDK+addWalletToStorage)
     * [.removeLastWalletFromStorage(storageWallets)](#Sp8deClientSDK+removeLastWalletFromStorage)
     * [.clearWalletStorage(storageWallets)](#Sp8deClientSDK+clearWalletStorage)
-    * [.getActiveWalletFromStorage(array)](#Sp8deClientSDK+getActiveWalletFromStorage) ⇒ <code>string</code>
+    * [.getActiveWalletFromStorage(Wallets)](#Sp8deClientSDK+getActiveWalletFromStorage) ⇒ <code>string</code>
     * [.getWalletsListFromStorage(storageWallets)](#Sp8deClientSDK+getWalletsListFromStorage) ⇒ <code>Array.&lt;string&gt;</code>
     * [.isWalletsInStorage(storageWallets)](#Sp8deClientSDK+isWalletsInStorage) ⇒ <code>boolean</code>
 
-<a name="Sp8deClientSDK+generatePrivateKey"></a>
 
-### sp8deClientSDK.generatePrivateKey() ⇒ <code>number</code>
+### generatePrivateKey() ⇒ <code>number</code>
 Returns a new private key
 
 
 **Returns**: <code>number</code> - A public key of 66 characters long
-<a name="Sp8deClientSDK+generateWallet"></a>
 
-### sp8deClientSDK.generateWallet() ⇒ <code>object</code>
+### generateWallet() ⇒ <code>object</code>
 Returns a new wallet
 
 
 **Returns**: <code>object</code> - Object contains wallet
-<a name="Sp8deClientSDK+encryptWallet"></a>
 
-### sp8deClientSDK.encryptWallet(wallet, password) ⇒ <code>promise</code>
+### encryptWallet(wallet, password) ⇒ <code>promise</code>
 Returns a new wallet
 
 
@@ -170,11 +170,10 @@ Returns a new wallet
 | Param | Type | Description |
 | --- | --- | --- |
 | wallet | <code>object</code> | object with wallet |
-| password | <code>string</code> |  |
+| password | <code>string</code> | password |
 
-<a name="Sp8deClientSDK+decryptWallet"></a>
 
-### sp8deClientSDK.decryptWallet(wallet, password) ⇒ <code>promise</code>
+### decryptWallet(wallet, password) ⇒ <code>promise</code>
 Returns a new wallet
 
 
@@ -183,11 +182,10 @@ Returns a new wallet
 | Param | Type | Description |
 | --- | --- | --- |
 | wallet | <code>string</code> | Encrypted JSON with wallet |
-| password | <code>string</code> |  |
+| password | <code>string</code> | password |
 
-<a name="Sp8deClientSDK+getPubKey"></a>
 
-### sp8deClientSDK.getPubKey(privateKey) ⇒ <code>string</code>
+### getPubKey(privateKey) ⇒ <code>string</code>
 Returns the public key obtains from the private key
 
 
@@ -197,9 +195,41 @@ Returns the public key obtains from the private key
 | --- | --- | --- |
 | privateKey | <code>string</code> | private key |
 
-<a name="Sp8deClientSDK+getRandomFromArray"></a>
 
-### sp8deClientSDK.getRandomFromArray(parameters) ⇒ <code>Array.&lt;number&gt;</code>
+### generateArraySeed(signs) ⇒ <code>Array.&lt;number&gt;</code>
+Returns an seed-array (use keccak-384 algorithm)
+
+
+**Returns**: <code>Array.&lt;number&gt;</code> - An array containing random numbers
+
+| Param | Type | Description |
+| --- | --- | --- |
+| signs | <code>Array.&lt;string&gt;</code> | array of signs |
+
+
+### getHash(string) ⇒ <code>ArrayBuffer</code>
+Returns an hash from string
+
+
+**Returns**: <code>ArrayBuffer</code> - An ArrayBuffer contains hash
+
+| Param | Type |
+| --- | --- |
+| string | <code>string</code> |
+
+
+### generateArrayFromHash(hash) ⇒ <code>Array.&lt;number&gt;</code>
+Returns an array of Uint32 numbers from hash
+
+
+**Returns**: <code>Array.&lt;number&gt;</code> - array of of Uint32 numbers
+
+| Param | Type |
+| --- | --- |
+| hash | <code>ArrayBuffer</code> |
+
+
+### getRandomFromArray(parameters) ⇒ <code>Array.&lt;number&gt;</code>
 Returns an array of random numbers from seed-array (use mt19937 algorithm)
 
 
@@ -209,16 +239,14 @@ Returns an array of random numbers from seed-array (use mt19937 algorithm)
 | --- | --- | --- |
 | parameters | <code>Object</code> | {array: [], min: number, max: number, count: number} |
 
-<a name="Sp8deClientSDK+generateSeed"></a>
 
-### sp8deClientSDK.generateSeed() ⇒ <code>number</code>
+### generateSeed() ⇒ <code>number</code>
 Returns a random number to use as a seed
 
 
 **Returns**: <code>number</code> - Random seed number. Length 9-10
-<a name="Sp8deClientSDK+signMessage"></a>
 
-### sp8deClientSDK.signMessage(parameters) ⇒ <code>string</code>
+### signMessage(parameters) ⇒ <code>string</code>
 Signs a message from privateKey, seed, nonce. Returns message signed with private key.
 
 
@@ -228,9 +256,8 @@ Signs a message from privateKey, seed, nonce. Returns message signed with privat
 | --- | --- | --- |
 | parameters | <code>Object</code> | {privateKey: string, seed: number, nonce: number} |
 
-<a name="Sp8deClientSDK+validateSign"></a>
 
-### sp8deClientSDK.validateSign(parameters) ⇒ <code>boolean</code>
+### validateSign(parameters) ⇒ <code>boolean</code>
 Validates the message. Use sign, nonce, public key and seed. Returns true if the validation was successful.
 
 
@@ -240,9 +267,8 @@ Validates the message. Use sign, nonce, public key and seed. Returns true if the
 | --- | --- | --- |
 | parameters | <code>Object</code> | {sign: string, pubKey: string, seed: number, nonce: number} |
 
-<a name="Sp8deClientSDK+addWalletToStorage"></a>
 
-### sp8deClientSDK.addWalletToStorage(value, storageWallets)
+### addWalletToStorage(value, storageWallets)
 Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
 
 
@@ -250,22 +276,20 @@ Add to localstorage to key Wallets in key "User" or root. If user without field 
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>string</code> | Private key |
-| storageWallets | <code>object</code> \| <code>array</code> | Object wallet contained in storage |
+| storageWallets | <code>object</code> \| <code>array</code> | optional. Object wallet contained in storage |
 
-<a name="Sp8deClientSDK+removeLastWalletFromStorage"></a>
 
-### sp8deClientSDK.removeLastWalletFromStorage(storageWallets)
+### removeLastWalletFromStorage(storageWallets)
 Removing last private key from array in localstorage
 
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| storageWallets | <code>object</code> \| <code>array</code> | Object wallet contained in storage |
+| storageWallets | <code>object</code> \| <code>array</code> | optional. Object wallet contained in storage |
 
-<a name="Sp8deClientSDK+clearWalletStorage"></a>
 
-### sp8deClientSDK.clearWalletStorage(storageWallets)
+### clearWalletStorage(storageWallets)
 Clear array of private keys (delete key from localstorage
 
 
@@ -274,9 +298,8 @@ Clear array of private keys (delete key from localstorage
 | --- | --- | --- |
 | storageWallets | <code>object</code> \| <code>array</code> | Object wallet contained in storage) |
 
-<a name="Sp8deClientSDK+getActiveWalletFromStorage"></a>
 
-### sp8deClientSDK.getActiveWalletFromStorage(array) ⇒ <code>string</code>
+### getActiveWalletFromStorage(Wallets) ⇒ <code>string</code>
 Returns active private key in localstorage
 
 
@@ -284,11 +307,10 @@ Returns active private key in localstorage
 
 | Param | Type | Description |
 | --- | --- | --- |
-| array | <code>array</code> | Array wallets contained in storage |
+| Wallets | <code>array</code> | optional. Array wallets contained in storage |
 
-<a name="Sp8deClientSDK+getWalletsListFromStorage"></a>
 
-### sp8deClientSDK.getWalletsListFromStorage(storageWallets) ⇒ <code>Array.&lt;string&gt;</code>
+### getWalletsListFromStorage(storageWallets) ⇒ <code>Array.&lt;string&gt;</code>
 Returns array of string contains all private keys from localstorage
 
 
@@ -296,11 +318,10 @@ Returns array of string contains all private keys from localstorage
 
 | Param | Type | Description |
 | --- | --- | --- |
-| storageWallets | <code>object</code> \| <code>array</code> | Object wallet contained in storage |
+| storageWallets | <code>object</code> \| <code>array</code> | optional. Object wallet contained in storage |
 
-<a name="Sp8deClientSDK+isWalletsInStorage"></a>
 
-### sp8deClientSDK.isWalletsInStorage(storageWallets) ⇒ <code>boolean</code>
+### isWalletsInStorage(storageWallets) ⇒ <code>boolean</code>
 Check if there are keys in vault
 
 
@@ -308,7 +329,7 @@ Check if there are keys in vault
 
 | Param | Type | Description |
 | --- | --- | --- |
-| storageWallets | <code>object</code> | User in storage, if it there is |
+| storageWallets | <code>object</code> | optional. User in storage, if it there is |
 
 # Get started
 # Intro
