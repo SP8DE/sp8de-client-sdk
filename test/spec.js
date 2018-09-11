@@ -38,6 +38,15 @@ describe('Test library', function () {
             _in = [1, 2, 3];
             out = [[1], [2], [3]];
             expect(sp8de.splitIntoPieces(_in, 1)).toEqual(out);
+            _in = [0, 0, 0];
+            out = [[0], [0], [0]];
+            expect(sp8de.splitIntoPieces(_in, 1)).toEqual(out);
+            _in = [0, 0, 0, 0];
+            out = [[0, 0], [0, 0]];
+            expect(sp8de.splitIntoPieces(_in, 2)).toEqual(out);
+            _in = [0, 0, 0, 0];
+            out = [[0, 0, 0, 0]];
+            expect(sp8de.splitIntoPieces(_in, 4)).toEqual(out);
             _in = [];
             out = [];
             expect(sp8de.splitIntoPieces(_in, 3)).toEqual(out);
