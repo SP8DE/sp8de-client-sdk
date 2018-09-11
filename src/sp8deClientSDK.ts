@@ -462,7 +462,7 @@ interface WalletEncrypt {
 */
 class AccessoryFunctions {
     static getRandomValues(buf: Uint8Array): ArrayBuffer {
-        var wrapper;
+        let wrapper;
         if (typeof window !== 'undefined') {
             wrapper = window;
         } else if (typeof global !== 'undefined') {
@@ -479,14 +479,14 @@ class AccessoryFunctions {
                 throw new TypeError('expected Uint8Array');
             }
             if (buf.length > 65536) {
-                var e = new Error();
+                let e = new Error();
                 e.message = 'Failed to execute \'getRandomValues\' on \'Crypto\': The ' +
                     'ArrayBufferView\'s byte length (' + buf.length + ') exceeds the ' +
                     'number of bytes of entropy available via this API (65536).';
                 e.name = 'QuotaExceededError';
                 throw e;
             }
-            var bytes = wrapper['nodeCrypto'].randomBytes(buf.length);
+            let bytes = wrapper['nodeCrypto'].randomBytes(buf.length);
             buf.set(bytes);
             return buf;
         }
