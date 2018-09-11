@@ -43,550 +43,74 @@
 
 
     <section>
-        <article><h2>Sp8de crypto client SDK</h2><p>SDK for client</p>
-<h2>Install</h2><h3>NPM</h3><pre class="prettyprint source"><code>npm install sp8de-client-sdk</code></pre><p>For use NPM-package in applications, you need to add references to cryptographic libraries to the index.html file:</p>
-<pre class="prettyprint source"><code>&lt;script src=&quot;https://www.mobilefish.com/scripts/ethereumjs/ethereumjs-util.js&quot;>&lt;/script>
-&lt;script src=&quot;https://cdn.ethers.io/scripts/ethers-v3.min.js&quot;>&lt;/script></code></pre><h3>CDN</h3><pre class="prettyprint source"><code>&lt;script src=&quot;https:/*.js&quot;>&lt;/script></code></pre><h2>NPM commands</h2><p><code>doc</code>: Run generate documentation from jsdoc</p>
-<p><code>test</code>: Run karma test</p>
-<p><code>watch</code>: Run watchify to autorun browserify for create single file</p>
-<p><code>toCDN</code>: Create single file with browserify and minification</p>
-<h2>Usage</h2><h3>NPM</h3><pre class="prettyprint source lang-js"><code>import {Sp8deClientSDK} from 'sp8de-client-sdk';
-// or
-const Sp8deClientSDK = require('sp8de-client-sdk');
-
-const sp8deClientSDK = new Sp8deClientSDK.Methods();
-
-const seed = sp8deClientSDK.generateSeed();
-// returns seed</code></pre><h3>CDN</h3><pre class="prettyprint source lang-js"><code>const seed = sp8deClientSDK.generateSeed();
-// returns seed</code></pre><h3>Store wallets in localstorage</h3><p>Methods for storing wallet in the storage use the choice between <code>wallets</code> and <code>user</code> keys in localstorage (for situations where the user-object in the application).
-If in localstorage has a <code>user</code> key, then wallet will be added to him in key <code>wallets</code>.</p>
-<h2>About</h2><p>The SDK contains functions that allow you to perform signature signing operations, verify signatures of other services. Also contains methods for adding created wallets to localstorage.</p>
-<h2>Examples</h2><h3>Wallet procedures</h3><h4>Save on init</h4><pre class="prettyprint source lang-js"><code>public init() {
-    // Check wallets in storage
-    if (this.sp8deClientSDK.isWalletsInStorage()) {
-      // Get wallet and decript him
-      from(this.sp8deClientSDK.decryptWallet(this.sp8deClientSDK.getActiveWalletFromStorage(), this.password))
-        .pipe(
-          map(item => &lt;any>item)
-        )
-        .subscribe(wallet => {
-          // Save private key
-          this.privateKey = wallet.privateKey;
-          // Generate public key
-          this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
-        });
-    } else {
-      // Generate wallet containing private key.
-      let wallet;
-      this.privateKey = wallet.privateKey;
-          // Generate public key from private key
-          this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
-          // Encrypting the wallet before uploading it to the storage for data security.
-          from(this.sp8deClientSDK.encryptWallet(this.sp8deClientSDK.generateWallet(), password))
-            .pipe(
-              map(item => &lt;any>item)
-            )
-            .subscribe(res => {
-              // Save encrypted wallet to localstorage
-              this.sp8deClientSDK.addWalletToStorage(res);
-            });
-    }
-  }</code></pre><h4>Open for use</h4><pre class="prettyprint source lang-js"><code>    // Getting wallet from storage
-    let storageWallet = this.sp8deClientSDK.getActiveWalletFromStorage();
-    // Decrypt wallet for edxecute private key
-    this.sp8deClientSDK.decryptWallet(storageWallet, password).then(decryptRes => {
-        // Getting private key
-        this.privateKey = decryptRes.privateKey
-    })</code></pre><h3>Signing</h3><pre class="prettyprint source lang-js"><code>    // set current date in milliseconds as nonce
-    const nonce = +(new Date());
-    // generate seed
-    const seed = this.sp8deClientSDK.generateSeed();
-    // signing message
-    const sign = this.sp8deClientSDK.signMessage({privateKey: this.privateKey, seed: seed, nonce: nonce});</code></pre><h3>Validate</h3><p>Validating random number from array-seed</p>
-<pre class="prettyprint source lang-js"><code>  public validateWin(array: number[], serverNumber: number[]): boolean {
-    // generate random number from array
-    const clientNumber = this.getRandomFromArray({array: array, min: 1, max: 6, length: winNumber.length});
-    if (!clientNumber) {
-      console.error('Server value invalid!');
-      return;
-    }
-    return clientNumber[0] === serverNumber[0];
-  }</code></pre><h2>API</h2><ul>
-<li><a href="#Sp8deClientSDK">Sp8deClientSDK</a><ul>
-<li><a href="#Sp8deClientSDK+generatePrivateKey">.generatePrivateKey()</a> ⇒ <code>number</code></li>
-<li><a href="#Sp8deClientSDK+generateWallet">.generateWallet()</a> ⇒ <code>object</code></li>
-<li><a href="#Sp8deClientSDK+encryptWallet">.encryptWallet(wallet, password)</a> ⇒ <code>promise</code></li>
-<li><a href="#Sp8deClientSDK+decryptWallet">.decryptWallet(wallet, password)</a> ⇒ <code>promise</code></li>
-<li><a href="#Sp8deClientSDK+getPubKey">.getPubKey(privateKey)</a> ⇒ <code>string</code></li>
-<li><a href="#Sp8deClientSDK+getRandomFromArray">.getRandomFromArray(parameters)</a> ⇒ <code>Array.&lt;number&gt;</code></li>
-<li><a href="#Sp8deClientSDK+generateSeed">.generateSeed()</a> ⇒ <code>number</code></li>
-<li><a href="#Sp8deClientSDK+signMessage">.signMessage(parameters)</a> ⇒ <code>string</code></li>
-<li><a href="#Sp8deClientSDK+validateSign">.validateSign(parameters)</a> ⇒ <code>boolean</code></li>
-<li><a href="#Sp8deClientSDK+addWalletToStorage">.addWalletToStorage(value, storageWallets)</a></li>
-<li><a href="#Sp8deClientSDK+removeLastWalletFromStorage">.removeLastWalletFromStorage(storageWallets)</a></li>
-<li><a href="#Sp8deClientSDK+clearWalletStorage">.clearWalletStorage(storageWallets)</a></li>
-<li><a href="#Sp8deClientSDK+getActiveWalletFromStorage">.getActiveWalletFromStorage(array)</a> ⇒ <code>string</code></li>
-<li><a href="#Sp8deClientSDK+getWalletsListFromStorage">.getWalletsListFromStorage(storageWallets)</a> ⇒ <code>Array.&lt;string&gt;</code></li>
-<li><a href="#Sp8deClientSDK+isWalletsInStorage">.isWalletsInStorage(storageWallets)</a> ⇒ <code>boolean</code></li>
-</ul>
-</li>
-</ul>
-<p><a name="Sp8deClientSDK+generatePrivateKey"></a></p>
-<h3>sp8deClientSDK.generatePrivateKey() ⇒ <code>number</code></h3><p>Returns a new private key</p>
-<p><strong>Returns</strong>: <code>number</code> - A public key of 66 characters long
-<a name="Sp8deClientSDK+generateWallet"></a></p>
-<h3>sp8deClientSDK.generateWallet() ⇒ <code>object</code></h3><p>Returns a new wallet</p>
-<p><strong>Returns</strong>: <code>object</code> - Object contains wallet
-<a name="Sp8deClientSDK+encryptWallet"></a></p>
-<h3>sp8deClientSDK.encryptWallet(wallet, password) ⇒ <code>promise</code></h3><p>Returns a new wallet</p>
-<p><strong>Returns</strong>: <code>promise</code> - promise with json</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>wallet</td>
-<td><code>object</code></td>
-<td>object with wallet</td>
-</tr>
-<tr>
-<td>password</td>
-<td><code>string</code></td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+decryptWallet"></a></p>
-<h3>sp8deClientSDK.decryptWallet(wallet, password) ⇒ <code>promise</code></h3><p>Returns a new wallet</p>
-<p><strong>Returns</strong>: <code>promise</code> - promise with json</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>wallet</td>
-<td><code>string</code></td>
-<td>Encrypted JSON with wallet</td>
-</tr>
-<tr>
-<td>password</td>
-<td><code>string</code></td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+getPubKey"></a></p>
-<h3>sp8deClientSDK.getPubKey(privateKey) ⇒ <code>string</code></h3><p>Returns the public key obtains from the private key</p>
-<p><strong>Returns</strong>: <code>string</code> - A public key of 42 characters long</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>privateKey</td>
-<td><code>string</code></td>
-<td>private key</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+getRandomFromArray"></a></p>
-<h3>sp8deClientSDK.getRandomFromArray(parameters) ⇒ <code>Array.&lt;number&gt;</code></h3><p>Returns an array of random numbers from seed-array (use mt19937 algorithm)</p>
-<p><strong>Returns</strong>: <code>Array.&lt;number&gt;</code> - An array of length given by a &quot;count&quot; containing random numbers</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>parameters</td>
-<td><code>Object</code></td>
-<td>{array: [], min: number, max: number, count: number}</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+generateSeed"></a></p>
-<h3>sp8deClientSDK.generateSeed() ⇒ <code>number</code></h3><p>Returns a random number to use as a seed</p>
-<p><strong>Returns</strong>: <code>number</code> - Random seed number. Length 9-10
-<a name="Sp8deClientSDK+signMessage"></a></p>
-<h3>sp8deClientSDK.signMessage(parameters) ⇒ <code>string</code></h3><p>Signs a message from privateKey, seed, nonce. Returns message signed with private key.</p>
-<p><strong>Returns</strong>: <code>string</code> - Message signed with private key</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>parameters</td>
-<td><code>Object</code></td>
-<td>{privateKey: string, seed: number, nonce: number}</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+validateSign"></a></p>
-<h3>sp8deClientSDK.validateSign(parameters) ⇒ <code>boolean</code></h3><p>Validates the message. Use sign, nonce, public key and seed. Returns true if the validation was successful.</p>
-<p><strong>Returns</strong>: <code>boolean</code> - True if successful, false if unsuccessful</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>parameters</td>
-<td><code>Object</code></td>
-<td>{sign: string, pubKey: string, seed: number, nonce: number}</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+addWalletToStorage"></a></p>
-<h3>sp8deClientSDK.addWalletToStorage(value, storageWallets)</h3><p>Add to localstorage to key Wallets in key &quot;User&quot; or root. If user without field &quot;Wallets&quot; add it.</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>value</td>
-<td><code>string</code></td>
-<td>Private key</td>
-</tr>
-<tr>
-<td>storageWallets</td>
-<td><code>object</code> \</td>
-<td><code>array</code></td>
-<td>Object wallet contained in storage</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+removeLastWalletFromStorage"></a></p>
-<h3>sp8deClientSDK.removeLastWalletFromStorage(storageWallets)</h3><p>Removing last private key from array in localstorage</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>storageWallets</td>
-<td><code>object</code> \</td>
-<td><code>array</code></td>
-<td>Object wallet contained in storage</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+clearWalletStorage"></a></p>
-<h3>sp8deClientSDK.clearWalletStorage(storageWallets)</h3><p>Clear array of private keys (delete key from localstorage</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>storageWallets</td>
-<td><code>object</code> \</td>
-<td><code>array</code></td>
-<td>Object wallet contained in storage)</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+getActiveWalletFromStorage"></a></p>
-<h3>sp8deClientSDK.getActiveWalletFromStorage(array) ⇒ <code>string</code></h3><p>Returns active private key in localstorage</p>
-<p><strong>Returns</strong>: <code>string</code> - Active private key or null if no array</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>array</td>
-<td><code>array</code></td>
-<td>Array wallets contained in storage</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+getWalletsListFromStorage"></a></p>
-<h3>sp8deClientSDK.getWalletsListFromStorage(storageWallets) ⇒ <code>Array.&lt;string&gt;</code></h3><p>Returns array of string contains all private keys from localstorage</p>
-<p><strong>Returns</strong>: <code>Array.&lt;string&gt;</code> - Array of private keys or null if no array</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>storageWallets</td>
-<td><code>object</code> \</td>
-<td><code>array</code></td>
-<td>Object wallet contained in storage</td>
-</tr>
-</tbody>
-</table>
-<p><a name="Sp8deClientSDK+isWalletsInStorage"></a></p>
-<h3>sp8deClientSDK.isWalletsInStorage(storageWallets) ⇒ <code>boolean</code></h3><p>Check if there are keys in vault</p>
-<p><strong>Returns</strong>: <code>boolean</code> - True if there is, false is not</p>
-<table>
-<thead>
-<tr>
-<th>Param</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>storageWallets</td>
-<td><code>object</code></td>
-<td>User in storage, if it there is</td>
-</tr>
-</tbody>
-</table>
-<h1>Get started</h1><h1>Intro</h1><p>Next, we show how you can create a minimal-functional game &quot;Dices&quot; on Angular2,
-in which the library <code>sp8de-client-sdk</code> will be used to ensure the reliability of
-gaming operations.</p>
-<h2>Installing</h2><p>For use <code>sp8de-client-sdk</code> functions it is necessary install him from NPM:</p>
-<pre class="prettyprint source"><code>npm install sp8de-client-sdk</code></pre><p>And for Angular2 + applications, you need to add references to cryptographic libraries to the index.html file:</p>
-<pre class="prettyprint source"><code>&lt;script src=&quot;https://www.mobilefish.com/scripts/ethereumjs/ethereumjs-util.js&quot;>&lt;/script>
-&lt;script src=&quot;https://cdn.ethers.io/scripts/ethers-v3.min.js&quot;>&lt;/script></code></pre><p>In <code>module.ts</code> need to import module <code>sp8de-client-sdk</code>
- and add to the array <code>providers</code>:</p>
-<pre class="prettyprint source lang-js"><code>import {Sp8deClientSDK} from 'sp8de-client-sdk';
-
-@NgModule({
-...
-  providers: [Sp8deClientSDK]
-...
-})</code></pre><h2>Create services</h2><h3>Crypto service</h3><p>Create a service containing a cryptographic functions.</p>
-<pre class="prettyprint source"><code>ng g s crypto</code></pre><p>In the service import <code>sp8de-client-sdk</code>
-and declare it in the constructor.</p>
-<pre class="prettyprint source lang-js"><code>
-import {Sp8deClientSDK} from 'sp8de-client-sdk';
-...
-constructor(public sp8deClientSDK: Sp8deClientSDK) {
-  }</code></pre><p>Implements methods of the game.</p>
-<h4>Init</h4><p>Method creates a private key, if it is not in storage and generates a public key for further work:</p>
-<pre class="prettyprint source lang-js"><code>public init() {
-    // Check wallets in storage
-    if (this.sp8deClientSDK.isWalletsInStorage()) {
-      // Get wallet and decript him
-      from(this.sp8deClientSDK.decryptWallet(this.sp8deClientSDK.getActiveWalletFromStorage(), this.password))
-        .pipe(
-          map(item => &lt;any>item)
-        )
-        .subscribe(wallet => {
-          // Save private key
-          this.privateKey = wallet.privateKey;
-          // Generate public key
-          this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
-        });
-    } else {
-      // Generate wallet containing private key.
-      let wallet;
-      this.privateKey = wallet.privateKey;
-          // Generate public key from private key
-          this.pubKey = this.sp8deClientSDK.getPubKey(this.privateKey);
-          // Encrypting the wallet before uploading it to the storage for data security.
-          from(this.sp8deClientSDK.encryptWallet(this.sp8deClientSDK.generateWallet(), password))
-            .pipe(
-              map(item => &lt;any>item)
-            )
-            .subscribe(res => {
-              // Save encrypted wallet to localstorage
-              this.sp8deClientSDK.addWalletToStorage(res);
-            });
-    }
-  }</code></pre><h4>Generate crypto-parameters</h4><p>Return values, required for the request to start game:</p>
-<pre class="prettyprint source lang-js"><code>public generateCryptoParameters(): any {
-    //  Create object
-    //  Wtite current date to nonce, current public key to pubKey
-    //  and generate seed
-    const resultParameters = {
-        nonce: +(new Date()),
-        seed: this.sp8deClientSDK.generateSeed(),
-        sign: '',
-        pubKey: this.pubKey
-      },
-      signParameters = {
-        privateKey: this.privateKey,
-        seed: resultParameters.seed,
-        nonce: resultParameters.nonce
-      };
-    // Signing message
-    resultParameters.sign = this.sp8deClientSDK.signMessage(signParameters);
-    return resultParameters;
-  }</code></pre><h4>Getting random from array</h4><p>Check the random value returned from server at the end of game.
-Accept servers array and parameters of game:</p>
-<pre class="prettyprint source lang-js"><code>public getRandomFromArray(parameters: { array: any[]; min: number, max: number, length: number }): number[] {
-    return this.sp8deClientSDK.getRandomFromArray(parameters);
-}</code></pre><h4>Validate win</h4><p>Uses the previous method to validate server values. Accepted server array and random number.</p>
-<pre class="prettyprint source lang-js"><code>public validateWin(array: number[], serverNumber: number[]): boolean {
-    const clientNumber = this.getRandomFromArray({array: array, min: 1, max: 6, length: serverNumber.length});
-    if (!clientNumber) {
-      console.error('Server value invalid!');
-      return;
-    }
-    return clientNumber[0] === serverNumber[0];
-  }</code></pre><h4>Validate players</h4><p>Validate correctness of the information transmitted by the server about other players.</p>
-<pre class="prettyprint source lang-js"><code>public validatePlayers(response: GameFinishResponse): boolean[] {
-    const result: boolean[] = [];
-    for (const item of response.items) {
-      result.push(this.sp8deClientSDK.validateSign({
-          sign: item.sign,
-          pubKey: item.pubKey,
-          seed: item.seed,
-          nonce: item.nonce
-        }
-      ));
-    }
-    return result;
-  }</code></pre><h3>Game service</h3><p>We will create a service containing functions that work with the api
-and control the beginning and end of the game.</p>
-<pre class="prettyprint source"><code>ng g s game</code></pre><p>Implements methods for work the game.</p>
-<h4>Start game</h4><p>Through api sends a request with parameters of start the game.</p>
-<pre class="prettyprint source lang-js"><code>public startGame(parameters: GameStartRequest): Observable&lt;GameStartResponse> {
-    return this.api.apiDemoGameStartPost(parameters)
-      .pipe(
-        map(
-          item => {
-            return &lt;GameFinishResponse>item;
-          }));
-  }</code></pre><p>To request parameters, use the following interface:</p>
-<pre class="prettyprint source lang-js"><code>export interface GameStartRequest {
-    type?: GameStartRequest.TypeEnum;
-    bet?: Array&lt;number>;
-    betAmount?: number;
-    pubKey?: string;
-    sign?: string;
-    nonce?: number;
-}</code></pre><h4>End game</h4><p>Through api sends a request with parameters of start the game.</p>
-<pre class="prettyprint source lang-js"><code>  public endGame(parameters: GameFinishRequest): Observable&lt;GameFinishResponse> {
-    return this.api.apiDemoGameEndPost(parameters).pipe(
-      map(
-        item => {
-          return &lt;GameFinishResponse>item;
-        }));
-  }</code></pre><p>To request parameters, use the following interface:</p>
-<pre class="prettyprint source lang-js"><code>export interface GameFinishRequest {
-    gameId?: string;
-    pubKey?: string;
-    sign?: string;
-    seed?: number;
-    nonce?: number;
-}</code></pre><h2>Create game component</h2><p>Let's create the logic of the component.
-Set user parameters on initialize the component
-and write logic of game.</p>
-<h3>On init</h3><p>On initialisation create public and private key for the user.</p>
-<pre class="prettyprint source lang-js"><code>ngOnInit() {
-    this.cryptoService.init();
-}</code></pre><h3>Start game</h3><p>The logic of the game is as follows:</p>
-<ol>
-<li>In the event parameter, values relating to the game conditions are passed.
-This is the type of the game, the selected dices values and the bet.</li>
-<li>In the method create parameters, necessary for cryptographic operations.
-This is a public key, a signed message and a nonce.</li>
-<li>These parameters are collected together and sent to the server as a request to start games.
-The server returns an object in which the following fields are required for the game:<ul>
-<li>gameId — game identification</li>
-<li>items — array with the data of other players</li>
-</ul>
-</li>
-<li>Send to the server request to the end of game with the previously obtained cryptographic
-parameters and gameId.</li>
-<li>Server should send a response, that contains the following information:<ul>
-<li>isWinner — did the player win</li>
-<li>winNumbers — dropped dices</li>
-<li>winAmount — amount of winnings</li>
-<li>items — array with data from other players</li>
-<li>sharedSeedArray — seed-array from which a random value of the dropped dice is generated.
-The last two values can be validated on the client.</li>
-</ul>
-</li>
-<li>We'll find out whether the data is correct by running the <code>sp8de-client-sdk</code>
-library to validate data about other players and the dropped value</li>
-</ol>
-<p>Below is the code of the method that implements this logic, using
-previously created services:</p>
-<pre class="prettyprint source lang-js"><code>public start(event): void {
-    const cryptoParameters = this.cryptoService.generateCryptoParameters();
-    this.gameService.startGame({
-        type: event.type,
-        bet: event.currentBet,
-        betAmount: event.currentBetAmount,
-        pubKey: cryptoParameters.pubKey,
-        sign: cryptoParameters.sign,
-        nonce: cryptoParameters.nonce
-      }).pipe(
-      switchMap(startResponse => {
-        return this.gameService.endGame({
-          gameId: startResponse.gameId,
-          sign: cryptoParameters.sign,
-          seed: cryptoParameters.seed,
-          nonce: cryptoParameters.nonce,
-          pubKey: cryptoParameters.pubKey
-        });
-      })).subscribe(res => {
-        const validWin = this.cryptoService.validateWin(res.sharedSeedArray, res.winNumbers),
-          validItems = this.cryptoService.validatePlayers(res),
-          win = this.checkWin(res.winNumbers, event.currentBet);
-        console.log('Validate items: ', validItems);
-        console.log('Validate win: ', validWin);
-        console.log(win ? `You win ${res.winAmount}` : 'You lose');
-      },
-      error => {
-        console.error(error.message);
-      });
-  }</code></pre><p>Now you can call method start(event) with game parameters and get to the console result:</p>
-<pre class="prettyprint source lang-js"><code>js:
-start({
-    type: 'Dice',
-    bet: [1, 2],
-    betAmount: 100
-})
-
-console:
-Validate items: true
-Validate win: [true, true, true]
-You win 50</code></pre></article>
+        <article><h1>Global</h1><hr>
+<h2>Class: Sp8deClientSDK</h2><h3>Sp8deClientSDK.generatePrivateKey()</h3><p>Returns a new private key</p>
+<p><strong>Returns</strong>: <code>number</code>, A public key of 66 characters long</p>
+<h3>Sp8deClientSDK.generateWallet()</h3><p>Returns a new wallet</p>
+<p><strong>Returns</strong>: <code>object</code>, Object contains wallet</p>
+<h3>Sp8deClientSDK.encryptWallet(wallet, password)</h3><p>Returns a new wallet</p>
+<p><strong>Parameters</strong></p>
+<p><strong>wallet</strong>: <code>object</code>, object with wallet</p>
+<p><strong>password</strong>: <code>string</code>, Returns a new wallet</p>
+<p><strong>Returns</strong>: <code>promise</code>, promise with json</p>
+<h3>Sp8deClientSDK.decryptWallet(wallet, password)</h3><p>Returns a new wallet</p>
+<p><strong>Parameters</strong></p>
+<p><strong>wallet</strong>: <code>string</code>, Encrypted JSON with wallet</p>
+<p><strong>password</strong>: <code>string</code>, Returns a new wallet</p>
+<p><strong>Returns</strong>: <code>promise</code>, promise with json</p>
+<h3>Sp8deClientSDK.getPubKey(privateKey)</h3><p>Returns the public key obtains from the private key</p>
+<p><strong>Parameters</strong></p>
+<p><strong>privateKey</strong>: <code>string</code>, private key</p>
+<p><strong>Returns</strong>: <code>string</code>, A public key of 42 characters long</p>
+<h3>Sp8deClientSDK.generateArraySeed(signs)</h3><p>Returns an seed-array (use keccak-384 algorithm)</p>
+<p><strong>Parameters</strong></p>
+<p><strong>signs</strong>: <code>Array.&amp;lt;string&amp;gt;</code>, array of signs</p>
+<p><strong>Returns</strong>: <code>Array.&amp;lt;number&amp;gt;</code>, An array containing random numbers</p>
+<h3>Sp8deClientSDK.getHash(string)</h3><p>Returns an hash from string</p>
+<p><strong>Parameters</strong></p>
+<p><strong>string</strong>: <code>string</code>, Returns an hash from string</p>
+<p><strong>Returns</strong>: <code>ArrayBuffer</code>, An ArrayBuffer contains hash</p>
+<h3>Sp8deClientSDK.generateArrayFromHash(hash)</h3><p>Returns an array of Uint32 numbers from hash</p>
+<p><strong>Parameters</strong></p>
+<p><strong>hash</strong>: <code>ArrayBuffer</code>, Returns an array of Uint32 numbers from hash</p>
+<p><strong>Returns</strong>: <code>Array.&amp;lt;number&amp;gt;</code>, array of of Uint32 numbers</p>
+<h3>Sp8deClientSDK.getRandomFromArray(parameters)</h3><p>Returns an array of random numbers from seed-array (use mt19937 algorithm)</p>
+<p><strong>Parameters</strong></p>
+<p><strong>parameters</strong>: <code>Object</code>, {array: [], min: number, max: number, count: number}</p>
+<p><strong>Returns</strong>: <code>Array.&amp;lt;number&amp;gt;</code>, An array of length given by a &quot;count&quot; containing random numbers</p>
+<h3>Sp8deClientSDK.generateSeed()</h3><p>Returns a random number to use as a seed</p>
+<p><strong>Returns</strong>: <code>number</code>, Random seed number. Length 9-10</p>
+<h3>Sp8deClientSDK.signMessage(parameters)</h3><p>Signs a message from privateKey, seed, nonce. Returns message signed with private key.</p>
+<p><strong>Parameters</strong></p>
+<p><strong>parameters</strong>: <code>Object</code>, {privateKey: string, seed: number, nonce: number}</p>
+<p><strong>Returns</strong>: <code>string</code>, Message signed with private key</p>
+<h3>Sp8deClientSDK.validateSign(parameters)</h3><p>Validates the message. Use sign, nonce, public key and seed. Returns true if the validation was successful.</p>
+<p><strong>Parameters</strong></p>
+<p><strong>parameters</strong>: <code>Object</code>, {sign: string, pubKey: string, seed: number, nonce: number}</p>
+<p><strong>Returns</strong>: <code>boolean</code>, True if successful, false if unsuccessful</p>
+<h3>Sp8deClientSDK.addWalletToStorage(value, storageWallets)</h3><p>Add to localstorage to key Wallets in key &quot;User&quot; or root. If user without field &quot;Wallets&quot; add it.</p>
+<p><strong>Parameters</strong></p>
+<p><strong>value</strong>: <code>string</code>, Private key</p>
+<p><strong>storageWallets</strong>: <code>object | array</code>, optional. Object wallet contained in storage</p>
+<h3>Sp8deClientSDK.removeLastWalletFromStorage(storageWallets)</h3><p>Removing last private key from array in localstorage</p>
+<p><strong>Parameters</strong></p>
+<p><strong>storageWallets</strong>: <code>object | array</code>, optional. Object wallet contained in storage</p>
+<h3>Sp8deClientSDK.clearWalletStorage(storageWallets)</h3><p>Clear array of private keys (delete key from localstorage</p>
+<p><strong>Parameters</strong></p>
+<p><strong>storageWallets</strong>: <code>object | array</code>, Object wallet contained in storage)</p>
+<h3>Sp8deClientSDK.getActiveWalletFromStorage(Wallets)</h3><p>Returns active private key in localstorage</p>
+<p><strong>Parameters</strong></p>
+<p><strong>Wallets</strong>: <code>array</code>, optional. Array wallets contained in storage</p>
+<p><strong>Returns</strong>: <code>string</code>, Active private key or null if no array</p>
+<h3>Sp8deClientSDK.getWalletsListFromStorage(storageWallets)</h3><p>Returns array of string contains all private keys from localstorage</p>
+<p><strong>Parameters</strong></p>
+<p><strong>storageWallets</strong>: <code>object | array</code>, optional. Object wallet contained in storage</p>
+<p><strong>Returns</strong>: <code>Array.&amp;lt;string&amp;gt;</code>, Array of private keys or null if no array</p>
+<h3>Sp8deClientSDK.isWalletsInStorage(storageWallets)</h3><p>Check if there are keys in vault</p>
+<p><strong>Parameters</strong></p>
+<p><strong>storageWallets</strong>: <code>object</code>, optional. User in storage, if it there is</p>
+<p><strong>Returns</strong>: <code>boolean</code>, True if there is, false is not</p>
+<hr></article>
     </section>
 
 
@@ -603,7 +127,7 @@ You win 50</code></pre></article>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Aug 31 2018 10:22:35 GMT+0300 (MSK)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Sep 11 2018 16:50:20 GMT+0300 (MSK)
 </footer>
 
 <script> prettyPrint(); </script>
