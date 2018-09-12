@@ -19,9 +19,9 @@ Run creating js-bundle
 ```
 npm run tocdnmin
 ```
-Then include sd8deSDK.js in the HTML pages.
+Then include sp8deSDK.js in the HTML pages.
 ```
-<script src="sd8deSDK.js"></script>
+<script src="sp8deSDK.js"></script>
 ```
 
 ## NPM commands
