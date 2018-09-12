@@ -14,9 +14,14 @@ For use NPM-package in applications, you need to add references to cryptographic
 <script src="https://cdn.ethers.io/scripts/ethers-v3.min.js"></script>
 ```
 
-### CDN
+### Browser
+Run creating js-bundle
 ```
-<script src="https:/*.js"></script>
+npm run tocdnmin
+```
+Then include sd8deSDK.js in the HTML pages.
+```
+<script src="sd8deSDK.js"></script>
 ```
 
 ## NPM commands
@@ -25,9 +30,9 @@ For use NPM-package in applications, you need to add references to cryptographic
 
 `test`: Run karma test
 
-`watch`: Run watchify to autorun browserify for create single file
+`dev`: Run watching ts-generator and karma tests
 
-`toCDN`: Create single file with browserify and minification
+`tocdnmin`: Create single file with browserify and minification
 
 ## Usage
 ### NPM
@@ -41,7 +46,7 @@ const sp8deClientSDK = new Sp8deClientSDK.Methods();
 const seed = sp8deClientSDK.generateSeed();
 // returns seed
 ```
-### CDN
+### Browser
 ```js
 const seed = sp8deClientSDK.generateSeed();
 // returns seed
