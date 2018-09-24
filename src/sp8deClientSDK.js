@@ -530,5 +530,5 @@ var mt19937 = /** @class */ (function () {
     };
     return mt19937;
 }());
-if (typeof global === 'undefined' && typeof window !== 'undefined')
+if (typeof window !== 'undefined')
     window['sp8deClientSDK'] = new Sp8deClientSDK();
