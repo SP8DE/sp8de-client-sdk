@@ -38,7 +38,7 @@ var Sp8deClientSDK = /** @class */ (function () {
      * @description Returns a new wallet
      * @memberOf Sp8deClientSDK
      * @param {object} wallet - object with wallet
-     * @param {string} password
+     * @param {string} password -password
      * @return {promise} promise with json
      * */
     Sp8deClientSDK.prototype.encryptWallet = function (wallet, password) {
@@ -49,7 +49,7 @@ var Sp8deClientSDK = /** @class */ (function () {
      * @description Returns a new wallet
      * @memberOf Sp8deClientSDK
      * @param {string}  wallet - Encrypted JSON with wallet
-     * @param {string} password
+     * @param {string} password - password
      * @return {promise} promise with json
      * */
     Sp8deClientSDK.prototype.decryptWallet = function (wallet, password) {
@@ -87,6 +87,12 @@ var Sp8deClientSDK = /** @class */ (function () {
     Sp8deClientSDK.prototype.getHash = function (string) {
         return EthJS.keccak(string, '384');
     };
+    /**
+     * @description Returns an array of Uint32 numbers from hash
+     * @memberOf Sp8deClientSDK
+     * @param {ArrayBuffer} hash
+     * @return {number[]} array of of Uint32 numbers
+     * */
     Sp8deClientSDK.prototype.generateArrayFromHash = function (hash) {
         return this.splitIntoPieces(hash, 4)
             .map(this.toUint8)
@@ -201,6 +207,7 @@ var Sp8deClientSDK = /** @class */ (function () {
     };
     /**
      * @description Add to localstorage to key Wallets in key "User" or root. If user without field "Wallets" add it.
+     * @memberOf Sp8deClientSDK
      * @param value {string} Private key
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      */
@@ -227,6 +234,7 @@ var Sp8deClientSDK = /** @class */ (function () {
     };
     /**
      * @description Removing last private key from array in localstorage
+     * @memberOf Sp8deClientSDK
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      */
     Sp8deClientSDK.prototype.removeLastWalletFromStorage = function (storageWallets) {
@@ -249,6 +257,7 @@ var Sp8deClientSDK = /** @class */ (function () {
     };
     /**
      * @description Clear array of private keys (delete key from localstorage
+     * @memberOf Sp8deClientSDK
      * @param storageWallets {object | array} Object wallet contained in storage)
      */
     Sp8deClientSDK.prototype.clearWalletStorage = function (storageWallets) {
@@ -266,6 +275,7 @@ var Sp8deClientSDK = /** @class */ (function () {
     };
     /**
      * @description Returns active private key in localstorage
+     * @memberOf Sp8deClientSDK
      * @returns {string} Active private key or null if no array
      * @param Wallets {array} optional. Array wallets contained in storage
      */
@@ -275,6 +285,7 @@ var Sp8deClientSDK = /** @class */ (function () {
     };
     /**
      * @description Returns array of string contains all private keys from localstorage
+     * @memberOf Sp8deClientSDK
      * @param storageWallets {object | array} optional. Object wallet contained in storage
      * @return {string[]} Array of private keys or null if no array
      */
@@ -293,6 +304,7 @@ var Sp8deClientSDK = /** @class */ (function () {
     /**
      * @description  Check if there are keys in vault
      * @return {boolean} True if there is, false is not
+     * @memberOf Sp8deClientSDK
      * @param storageWallets {object}  optional. User in storage, if it there is
      */
     Sp8deClientSDK.prototype.isWalletsInStorage = function (storageWallets) {
