@@ -9,7 +9,7 @@
   },
   "author": "Pavel Zubov",
   "scripts": {
-    "doc": "jsdoc src/sp8deClientSDK.js README.md",
+    "doc": "jsdox src/sp8deClientSDK.js output/sp8deClientSDK.md",
     "test": "karma start",
     "ts": "tsc src/sp8deClientSDK.ts -w",
     "dev": "npm run test | npm run ts",
